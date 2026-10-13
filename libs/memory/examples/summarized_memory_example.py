@@ -2,8 +2,9 @@
 
 import asyncio
 
-from pygenai.memory import Message, MessageRole, SummarizedMemory
-
+from pygenai.memory import SummarizedMemory
+from pygenai.core.base_memory import Message
+from pygenai.core.models import MessageRole
 
 async def main():
     """Demonstrate SummarizedMemory auto-compression."""

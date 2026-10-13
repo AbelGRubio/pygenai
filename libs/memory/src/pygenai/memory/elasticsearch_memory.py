@@ -63,7 +63,7 @@ class ElasticsearchMemory(SemanticSearchAdapter):
                 "mappings": {
                     "properties": {
                         "message_id": {"type": "keyword"},
-                        "role": {"type": "keyword"},
+                        "type": {"type": "keyword"},
                         "content": {"type": "text"},
                         "tokens": {"type": "integer"},
                         "timestamp": {"type": "date"},
@@ -86,7 +86,7 @@ class ElasticsearchMemory(SemanticSearchAdapter):
 
         doc = {
             "message_id": message.id,
-            "role": message.role.value,
+            "type": message.type,
             "content": message.content,
             "tokens": message.tokens,
             "timestamp": message.timestamp.isoformat(),
@@ -130,7 +130,7 @@ class ElasticsearchMemory(SemanticSearchAdapter):
             source = hit["_source"]
             message = Message(
                 id=source["message_id"],
-                role=source["role"],
+                type=source["type"],
                 content=source["content"],
                 tokens=source.get("tokens", 0),
                 metadata=source.get("metadata", {}),

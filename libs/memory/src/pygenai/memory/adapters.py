@@ -10,7 +10,7 @@ from pygenai.core.models import ConversationState
 
 class InMemoryAdapter(PersistenceAdapter):
     """
-    In-memory persistence adapter for development and testing.
+    In-memory persistence adapter fora development and testing.
 
     Stores conversation state in RAM. Data is lost when the process terminates.
     """

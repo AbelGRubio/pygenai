@@ -3,12 +3,11 @@
 import asyncio
 
 from pygenai.memory import (
-    ConversationState,
     InMemoryAdapter,
-    Message,
-    MessageRole,
 )
 
+from pygenai.core.base_memory import Message
+from pygenai.core.models import MessageRole, ConversationState
 
 async def main():
     """Demonstrate persistence adapter usage."""

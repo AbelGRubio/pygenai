@@ -138,7 +138,7 @@ class SummarizedMemory(MemoryStore):
                 messages_count=len(messages_to_summarize),
                 original_tokens=sum(m.tokens for m in messages_to_summarize),
                 metadata={
-                    "roles": {m.role.value for m in messages_to_summarize},
+                    "roles": {m.type for m in messages_to_summarize},
                 },
             )
 
@@ -161,8 +161,8 @@ class SummarizedMemory(MemoryStore):
         if not messages:
             return "No messages to summarize."
 
-        user_msgs = [m for m in messages if m.role == MessageRole.USER]
-        assistant_msgs = [m for m in messages if m.role == MessageRole.ASSISTANT]
+        user_msgs = [m for m in messages if m.type == MessageRole.USER]
+        assistant_msgs = [m for m in messages if m.type == MessageRole.ASSISTANT]
 
         summary_lines = [
             f"Summary of {len(messages)} messages:",

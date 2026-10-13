@@ -71,11 +71,21 @@ members = [
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = [
+    "src",
+    "libs/memory/src",
+    "libs/core/src",
+    "libs/llm/src",
+    "libs/rag/src"
+]
 addopts = [
     "-n",
     "auto",
     "--cov=src",
+    "--cov=libs/memory/src",
+    "--cov=libs/llm/src",
+    "--cov=libs/rag/src",
+    "--cov=libs/core/src",
     "--cov-report=xml",
     "--cov-report=json",
     "--cov-report=html",

@@ -2,8 +2,9 @@
 
 import asyncio
 
-from pygenai.memory import BufferMemory, Message, MessageRole, TokenCounter
-
+from pygenai.memory import BufferMemory
+from pygenai.core.base_memory import Message
+from pygenai.core.models import MessageRole
 
 async def main():
     """Demonstrate BufferMemory usage."""

@@ -2,8 +2,9 @@
 
 import asyncio
 
-from pygenai.memory import Message, MessageRole, WindowMemory
-
+from pygenai.memory import WindowMemory
+from pygenai.core.base_memory import Message
+from pygenai.core.models import MessageRole
 
 async def main():
     """Demonstrate WindowMemory usage with token and turn limits."""
