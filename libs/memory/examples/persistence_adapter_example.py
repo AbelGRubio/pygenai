@@ -36,7 +36,7 @@ async def main():
         state.messages.append(msg)
         state.total_tokens += msg.tokens
 
-    print(f"Initial state:")
+    print("Initial state:")
     print(f"  Messages: {len(state.messages)}")
     print(f"  Total tokens: {state.total_tokens}")
     print(f"  Metadata: {state.metadata}\n")
@@ -54,18 +54,18 @@ async def main():
     loaded_state = await adapter.load(session_id)
 
     if loaded_state:
-        print(f"Loaded state:")
+        print("Loaded state:")
         print(f"  Session ID: {loaded_state.session_id}")
         print(f"  Messages: {len(loaded_state.messages)}")
         print(f"  Total tokens: {loaded_state.total_tokens}")
         print(f"  Metadata: {loaded_state.metadata}")
 
-        print(f"\nMessages in loaded state:")
+        print("\nMessages in loaded state:")
         for msg in loaded_state.messages:
             print(f"  - {msg.role.value}: {msg.content}")
 
     # Delete session
-    print(f"\nDeleting session...")
+    print("\nDeleting session...")
     await adapter.delete(session_id)
 
     # Verify deletion

@@ -94,7 +94,7 @@ class BufferMemory(MemoryStore):
         """
         if session_id not in self._sessions:
             return ""
-        summaries_ = [s.summary for s in  self._sessions[session_id].summaries]
+        summaries_ = [s.summary for s in self._sessions[session_id].summaries]
         return "\n".join(summaries_)
 
     async def clear_messages(self, session_id: str) -> None:

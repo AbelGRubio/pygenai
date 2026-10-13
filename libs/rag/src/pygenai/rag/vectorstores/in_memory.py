@@ -13,8 +13,6 @@ Copyright ©2026 All rights reserved.
 
 from __future__ import annotations
 
-import re
-from collections import Counter
 from collections.abc import Sequence
 from typing import Any
 
@@ -22,7 +20,7 @@ from langchain_core.embeddings import Embeddings
 from langchain_core.vectorstores import InMemoryVectorStore as LangChainInMemoryVectorStore
 
 from pygenai.core.data import Chunk, Document, SearchHit, from_langchain_document, to_langchain_document
-from pygenai.rag.embeddings import SimpleEmbeddings, LiteLLMEmbeddings
+from pygenai.rag.embeddings import LiteLLMEmbeddings, SimpleEmbeddings
 from pygenai.rag.vectorstores.base import VectorStore
 
 
@@ -77,9 +75,11 @@ class InMemoryVectorStore(VectorStore):
         document_ids = [str(getattr(document, "id", "")) for document in documents]
         return self._store.add_documents(langchain_documents, ids=document_ids)
 
-    def similarity_search(self, query: str, k: int = 5, *, filter: dict[str, Any] | None = None) -> list[SearchHit]:
+    def similarity_search(
+        self, query: str, k: int = 5, *, filter_search: dict[str, Any] | None = None
+    ) -> list[SearchHit]:
         """Return the best matches with their scores using LangChain vector search."""
-        matches = self._store.similarity_search_with_score(query, k=k, filter=filter)
+        matches = self._store.similarity_search_with_score(query, k=k, filter=filter_search)
         results: list[SearchHit] = []
         for document, score in matches:
             results.append(

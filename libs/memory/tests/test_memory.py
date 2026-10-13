@@ -162,6 +162,7 @@ class TestSummarizedMemory:
     @pytest.mark.asyncio
     async def test_custom_summarizer(self, summarized_memory):
         """Test using a custom summarizer."""
+
         def custom_summarizer(messages: list[Message]) -> str:
             return f"Custom summary of {len(messages)} messages"
 

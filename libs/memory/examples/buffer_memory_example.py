@@ -36,7 +36,7 @@ async def main():
 
     # Retrieve and display state
     state = await memory.get_state(session_id)
-    print(f"\nConversation Summary:")
+    print("\nConversation Summary:")
     print(f"  Total messages: {len(state.messages)}")
     print(f"  Total tokens: {state.total_tokens}")
     print(f"  Session ID: {state.session_id}")

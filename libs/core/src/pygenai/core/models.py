@@ -20,8 +20,7 @@ class MessageRole(StrEnum):
 
 
 class Message(BaseMessage):
-    """
-    Represents a single message in a conversation.
+    """Represents a single message in a conversation.
 
     Attributes:
         id: Unique identifier for the message.
@@ -37,11 +36,9 @@ class Message(BaseMessage):
     timestamp: datetime = field(default_factory=datetime.utcnow)
 
 
-
 @dataclass
 class SummaryRecord:
-    """
-    Represents a compressed summary of past conversation segments.
+    """Represents a compressed summary of past conversation segments.
 
     Attributes:
         id: Unique identifier for the summary.
@@ -87,8 +84,7 @@ class SummaryRecord:
 
 @dataclass
 class ConversationState:
-    """
-    Represents the complete state of a conversation.
+    """Represents the complete state of a conversation.
 
     Attributes:
         session_id: Unique session identifier.
@@ -105,7 +101,6 @@ class ConversationState:
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
-
 @dataclass(slots=True)
 class Document:
     """Canonical text unit stored in a RAG pipeline.
@@ -120,7 +115,7 @@ class Document:
     metadata: dict[str, Any] = field(default_factory=dict)
     source: str | None = None
 
-    def as_chunk(self, *, index: int = 0, start: int = 0, end: int | None = None) -> "Chunk":
+    def as_chunk(self, *, index: int = 0, start: int = 0, end: int | None = None) -> Chunk:
         """Convert the document into a chunk with the same content.
 
         Args:

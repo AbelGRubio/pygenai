@@ -1,53 +1,59 @@
+"""Creates a modular LangGraph agent with RAG, memory, and MCP integration."""
+
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Any, Dict, Optional, Union
 import uuid
+from dataclasses import dataclass, field
+from typing import Any, TypeAlias
 
 from langchain.agents import create_agent
-from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
+from langchain_core.messages import BaseMessage, HumanMessage
 from langchain_core.runnables import RunnableConfig
 from langchain_litellm import ChatLiteLLM
 from langchain_mcp_adapters.client import MultiServerMCPClient
-from langchain_mcp_adapters.sessions import StreamableHttpConnection, StdioConnection, SSEConnection, \
-    WebsocketConnection
-from langgraph.graph import StateGraph, END
+from langchain_mcp_adapters.sessions import (
+    SSEConnection,
+    StdioConnection,
+    StreamableHttpConnection,
+    WebsocketConnection,
+)
+from langgraph.graph import END, StateGraph
 from langgraph.graph.state import CompiledStateGraph
-from typing_extensions import TypeAlias, TypedDict
+from typing_extensions import TypedDict
 
 from pygenai.core.base_memory import MemoryTypes
 from pygenai.core.base_retriever import BaseRetriever
+from pygenai.core.logger import get_logger
 from pygenai.settings import get_settings
 from pygenai.utils.mcp_manager import get_mcp_manager
 
-MCPConnection: TypeAlias = Union[
-    StdioConnection,
-    SSEConnection,
-    StreamableHttpConnection,
-    WebsocketConnection
-]
+logger = get_logger(__name__)
+MCPConnection: TypeAlias = StdioConnection | SSEConnection | StreamableHttpConnection | WebsocketConnection  # noqa: UP040
 
 
 @dataclass
 class LLMConfig:
     """Configuration class for LLM instances."""
+
     provider: str
     model_name: str
-    api_base: Optional[str] = None
+    api_base: str | None = None
     temperature: float = 0.7
-    timeout: Optional[float] = None
-    retry_config: Dict[str, Any] = field(default_factory=lambda: {"max_retries": 2})
+    timeout: float | None = None
+    retry_config: dict[str, Any] = field(default_factory=lambda: {"max_retries": 2})
 
 
 class AgentState(TypedDict):
     """Defines the expanded state structure for the LangGraph agent across modular nodes."""
+
     messages: list[BaseMessage]
     context: dict[str, Any]
-    rag_query: Optional[str]
+    rag_query: str | None
     rag_texts: list[str]
     tools: list[Any]
     memory_data: dict[str, Any]
-    session_id: Optional[str]
+    session_id: str | None
+
 
 class AgentBuilder:
     """Builder class for constructing LangGraph agents following SOLID principles.
@@ -59,11 +65,11 @@ class AgentBuilder:
     def __init__(self, state_schema: Any = AgentState) -> None:
         """Initialize the AgentBuilder with empty configurations."""
         self._state_schema = state_schema
-        self._rag_sources: Dict[str, BaseRetriever] = {}
-        self._memory: Optional[MemoryTypes] = None
+        self._rag_sources: dict[str, BaseRetriever] = {}
+        self._memory: MemoryTypes | None = None
         self._skills: list[Any] = []
         self._mcps: dict[str, MCPConnection] = {}
-        self._mcp_client: Optional[MultiServerMCPClient] = None
+        self._mcp_client: MultiServerMCPClient | None = None
         self._mcp_manager = get_mcp_manager()
         self._define_default_llm()
 
@@ -75,7 +81,7 @@ class AgentBuilder:
             model="openai/gpt-4o-mini",
             temperature=0.7,
             api_key=settings.llm_api_key.get_secret_value(),
-            api_base=settings.model_base_url
+            api_base=settings.model_base_url,
         )
 
     async def _start_mcp_client(self) -> None:
@@ -92,11 +98,11 @@ class AgentBuilder:
         if not session_id:
             session_id = str(uuid.uuid1())
         if not self._rag_sources:
-            return {'session_id': session_id}
+            return {"session_id": session_id}
 
         messages: list[BaseMessage] = state.get("messages", [])
         if not messages:
-            return {'session_id': session_id}
+            return {"session_id": session_id}
 
         last_msg = messages[-1]
         if isinstance(last_msg, HumanMessage):
@@ -124,12 +130,12 @@ class AgentBuilder:
             decision_text = str(decision_response.content).strip().upper()
 
             if "YES" not in decision_text:
-                return {'session_id': session_id}
+                return {"session_id": session_id}
 
             _, question_ = decision_text.split("YES: ", 1)
 
         except Exception:
-            question_ = ''
+            question_ = ""
             pass
 
         for rag_name, rag_retriever in self._rag_sources.items():
@@ -139,11 +145,7 @@ class AgentBuilder:
             except Exception as e:
                 rag_texts.append(f"--- RAG [{rag_name}] error loading information: {e} ---")
 
-        return {
-            "rag_query": question_,
-            "rag_texts": rag_texts,
-            "session_id": session_id
-        }
+        return {"rag_query": question_, "rag_texts": rag_texts, "session_id": session_id}
 
     # --- Node 2: Prepara las tools de los MCPs y skills ---
     async def prepare_tools_node(self, state: AgentState) -> dict[str, Any]:
@@ -155,13 +157,12 @@ class AgentBuilder:
             try:
                 await self._start_mcp_client()
 
-                mcp_tools = await self._mcp_manager.get_active_tools(
-                    self._mcps, self._mcp_client
-                )
+                mcp_tools = await self._mcp_manager.get_active_tools(self._mcps, self._mcp_client)
                 available_tools.extend(mcp_tools)
 
             except Exception as e:
                 mcp_error_warning = f"[Warning: Failed to load tools from MCP servers: {e}]"
+                logger.warning(mcp_error_warning)
                 # current_context["mcp_warning"] = mcp_error_warning
 
         return {
@@ -181,10 +182,7 @@ class AgentBuilder:
             except Exception as e:
                 current_context["memory_error"] = str(e)
 
-        return {
-            "context": current_context,
-            "memory_data": current_context
-        }
+        return {"context": current_context, "memory_data": current_context}
 
     # --- Node 3: Call to reasoning llm ---
     async def reasoning_node(self, state: AgentState) -> dict[str, Any]:
@@ -220,10 +218,7 @@ class AgentBuilder:
         # Merge new responses with existing conversation messages
         updated_messages = current_context + [msg for msg in agent_messages if msg not in messages]
 
-        return {
-            "messages": updated_messages,
-            "context": current_context
-        }
+        return {"messages": updated_messages, "context": current_context}
 
     # --- Node 4: Save long memory interaction ---
     async def save_memory_node(self, state: Any) -> dict[str, Any]:
@@ -239,14 +234,10 @@ class AgentBuilder:
                 try:
                     existing_summary = await self._memory.get_summary(session_id)
                 except Exception:
-                    pass
+                    logger.warning(f"Memory summary not found for session {session_id}")
+                    existing_summary = None
 
-                conversation_history = "\n".join(
-                    [
-                        f"{m.type}:{m.content}"
-                        for m in user_messages
-                    ]
-                )
+                conversation_history = "\n".join([f"{m.type}:{m.content}" for m in user_messages])
 
                 summary_prompt = (
                     "Act as a long-term memory system for an AI assistant.\n"
@@ -271,15 +262,13 @@ class AgentBuilder:
                 )
 
                 try:
-                    summary_response = await self._llm.ainvoke(
-                        [HumanMessage(content=summary_prompt)]
-                    )
+                    summary_response = await self._llm.ainvoke([HumanMessage(content=summary_prompt)])
                     updated_summary = summary_response.content.strip()
 
                     if updated_summary:
                         await self._memory.add_summary(session_id, updated_summary)
                 except Exception:
-                    pass
+                    logger.warning("Failed to update memory summary.", exc_info=True)
 
         return {}
 
@@ -289,7 +278,7 @@ class AgentBuilder:
             model=config.model_name,
             temperature=config.temperature,
             api_base=config.api_base,
-            api_key=get_settings().llm_api_key.get_secret_value()
+            api_key=get_settings().llm_api_key.get_secret_value(),
         )
         return self
 
@@ -324,9 +313,9 @@ class AgentBuilder:
         # Add specialized nodes to the StateGraph
         workflow.add_node("prepare_rag_query", self.prepare_rag_query_node)
         workflow.add_node("prepare_tools", self.prepare_tools_node)
-        workflow.add_node("memory_node", self.memory_node) # Memoria largo plazo
+        workflow.add_node("memory_node", self.memory_node)  # Memoria largo plazo
         workflow.add_node("reasoning", self.reasoning_node)
-        workflow.add_node("save_memory", self.save_memory_node) # Save long memory
+        workflow.add_node("save_memory", self.save_memory_node)  # Save long memory
 
         # Wire the sequential execution flow
         workflow.set_entry_point("prepare_rag_query")

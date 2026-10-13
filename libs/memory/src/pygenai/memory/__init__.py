@@ -1,4 +1,5 @@
-"""Public export surface for the Pygenai memory package.
+"""
+Public export surface for the Pygenai memory package.
 
 ========================================================================================================================
 Name:         pygenai/memory/__init__.py

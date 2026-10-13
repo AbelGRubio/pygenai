@@ -11,7 +11,7 @@ import sys
 from functools import lru_cache
 
 from starlette.applications import Starlette
-from starlette.middleware.cors import CORSMiddleware  # noqa
+from starlette.middleware.cors import CORSMiddleware
 
 from pygenai.core.logger import get_logger
 from pygenai.core.middlewares.auth import AuthMiddleware

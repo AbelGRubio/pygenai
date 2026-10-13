@@ -29,4 +29,11 @@ class MarkdownLoader(FileDocumentLoader):
         path = Path(source)
         raw = self._read_text_file(path, encoding=encoding)
         metadata = self._metadata_from_path(path)
-        return [Document(id=self._build_document_id(path), text=raw, metadata={**metadata, "format": "markdown"}, source=str(path))]
+        return [
+            Document(
+                id=self._build_document_id(path),
+                text=raw,
+                metadata={**metadata, "format": "markdown"},
+                source=str(path),
+            )
+        ]

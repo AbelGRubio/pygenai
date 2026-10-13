@@ -1,7 +1,6 @@
 """Elasticsearch-based semantic search for conversation memory."""
 
 from elasticsearch import Elasticsearch
-
 from pygenai.core.base_memory import SemanticSearchAdapter
 from pygenai.core.models import Message
 
@@ -96,9 +95,7 @@ class ElasticsearchMemory(SemanticSearchAdapter):
 
         self._client.index(index=index_name, id=message.id, body=doc)
 
-    async def search(
-        self, session_id: str, query: str, top_k: int = 5
-    ) -> list[Message]:
+    async def search(self, session_id: str, query: str, top_k: int = 5) -> list[Message]:
         """
         Search for semantically similar messages.
 

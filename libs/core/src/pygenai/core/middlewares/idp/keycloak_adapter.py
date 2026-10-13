@@ -3,7 +3,6 @@
 from typing import Any, ClassVar
 
 import jwt
-
 from observe_core.security.idp.idp_adapter import IDPAdapter
 
 

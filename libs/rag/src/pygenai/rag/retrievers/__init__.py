@@ -20,6 +20,5 @@ __all__ = [
     "CrossEncoderReranker",
     "HybridRetriever",
     "NoOpReranker",
-    "RetrievedDocument",
     "VectorRetriever",
 ]

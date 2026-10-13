@@ -89,6 +89,7 @@ python_functions = "test_* it_* should_* scenario_*"
 [tool.coverage.run]
 omit = [
     "src/__main__.py",
+    "src/__streamlit__.py",
 ]
 
 [tool.coverage.report]
@@ -100,7 +101,18 @@ preview = true
 target-version = "py313"
 line-length = 120
 indent-width = 4
-extend-exclude = [".venv", "build", "dist", "notebooks_extra", "tests", "src/__main__.py"]
+force-exclude = true
+extend-exclude = [
+    ".venv",
+    "build",
+    "dist",
+    "notebooks_extra",
+    "tests",
+    "src/__main__.py",
+    "src/__streamlit__.py",
+    "**/examples/**",
+    "examples"
+]
 
 [tool.ruff.format]
 quote-style = "double"
@@ -148,15 +160,18 @@ section-order = [
 
 [tool.ruff.lint.per-file-ignores]
 "**/notebooks_extra/**" = ["ALL"]
+"**/examples/**" = ["ALL"]
 "**.ipynb" = ["E501", "D100", "D103", "D101", "E402", "I002", "T201"]
 "**/__init__.py" = ["D104", "F401"]
 "tests/**" = ["S101", "D103", "D100", "D104", "SLF001", "B018"]
 
 
+
 [tool.ty.src]
 respect-ignore-files = false
 include = ["src"]
-exclude = ["**/node_modules", "**/__pycache__", "**/*venv/**/*", "./build", "**/__main__.py"]
+exclude = ["**/node_modules", "**/__pycache__", "**/*venv/**/*", "./build", "**/__main__.py",
+"**/examples/**" ]
 
 [tool.pyrefly]
 use-ignore-files = false
@@ -165,11 +180,11 @@ project-excludes = [
     "**/node_modules",
     "**/__pycache__",
     "**/*venv/**/*",
-    "**/tests", "**/__main__.py"
+    "**/tests", "**/__main__.py",
+    "**/examples/**"
 ]
 search-path = [
     "src",
     # ".venv/lib/python3.13/site-packages",
     ".venv/Lib/site-packages",
 ]
-

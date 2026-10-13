@@ -141,19 +141,19 @@ async def main():
         api_key="sk-your-key",
         model="gpt-4o-mini",
     )
-    
+
     # Create provider
     provider = OpenAIProvider(config)
-    
+
     # Prepare messages
     messages = [
         Message(role="system", content="You are helpful."),
         Message(role="user", content="Explain AI."),
     ]
-    
+
     # Generate response
     response = await provider.generate(messages)
-    
+
     print(f"Response: {response.content}")
     print(f"Cost: ${response.cost:.6f}")
     print(f"Tokens: {response.usage.total_tokens}")
@@ -174,7 +174,7 @@ async def main():
         api_key="sk-...",
         model="gpt-4o",
     )
-    
+
     # Fallback providers
     fallbacks = [
         ProviderConfig(
@@ -188,15 +188,15 @@ async def main():
             base_url="http://localhost:11434",
         ),
     ]
-    
+
     # Create router
     router = LLMRouter(primary, fallbacks)
-    
+
     # Messages
     messages = [
         Message(role="user", content="What is AI?"),
     ]
-    
+
     # Generate (will fallback if primary fails)
     try:
         response = await router.generate(messages)
@@ -220,17 +220,17 @@ async def main():
         api_key="sk-...",
         model="gpt-4o-mini",
     )
-    
+
     provider = OpenAIProvider(config)
     tracker = CostTracker(log_file="/tmp/llm_costs.jsonl")
-    
+
     messages = [Message(role="user", content="Hello")]
-    
+
     # Make API calls
     for _ in range(3):
         response = await provider.generate(messages)
         tracker.record_call(response)
-    
+
     # Display audit report
     summary = tracker.get_summary()
     print(f"Total calls: {summary['total_calls']}")
@@ -252,13 +252,13 @@ async def main():
         api_key="sk-ant-...",
         model="claude-3-5-sonnet-20241022",
     )
-    
+
     provider = AnthropicProvider(config)
     messages = [
         Message(role="system", content="Expert Python programmer."),
         Message(role="user", content="Explain decorators."),
     ]
-    
+
     response = await provider.generate(messages)
     print(response.content)
 
@@ -278,10 +278,10 @@ async def main():
         model="gpt-4",  # deployment name
         base_url="https://your-resource.openai.azure.com",
     )
-    
+
     provider = AzureOpenAIProvider(config)
     messages = [Message(role="user", content="Hello Azure")]
-    
+
     response = await provider.generate(messages)
     print(response.content)
 
@@ -301,10 +301,10 @@ async def main():
         base_url="http://localhost:11434",
         timeout=120,  # Local inference may be slower
     )
-    
+
     provider = OllamaProvider(config)
     messages = [Message(role="user", content="Local inference test")]
-    
+
     response = await provider.generate(messages)
     print(response.content)
     print(f"Cost: ${response.cost:.2f} (free local model)")

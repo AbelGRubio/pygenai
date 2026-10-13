@@ -13,13 +13,11 @@ ImportError at import time if it's not available.
 
 from __future__ import annotations
 
-import io
 import logging
 import os
-from typing import Optional
 
-from pymongo import MongoClient
 import gridfs
+from pymongo import MongoClient
 
 from ._base import AbstractFileSystemUnitOfWork
 
@@ -43,6 +41,7 @@ class MongoFileSystemUnitOfWork(AbstractFileSystemUnitOfWork):
     """
 
     def __init__(self, route: str, mongo_uri: str = "mongodb://localhost:27017", database: str = "files") -> None:
+        """Initialize the MongoFileSystemUnitOfWork with a route and MongoDB connection."""
         super().__init__(route=route)
         self._route = self._normalize_prefix(route)
         self._client = MongoClient(mongo_uri)
@@ -51,7 +50,7 @@ class MongoFileSystemUnitOfWork(AbstractFileSystemUnitOfWork):
         self._fs = gridfs.GridFS(self._db)
 
     @staticmethod
-    def _normalize_prefix(prefix: Optional[str]) -> str:
+    def _normalize_prefix(prefix: str | None) -> str:
         """Normalize a prefix by stripping surrounding slashes and defaulting to "".
 
         Ensures consistent key construction when combining route and object keys.
@@ -60,7 +59,7 @@ class MongoFileSystemUnitOfWork(AbstractFileSystemUnitOfWork):
             return ""
         return prefix.strip("/")
 
-    def _object_key(self, key: Optional[str]) -> str:
+    def _object_key(self, key: str | None) -> str:
         """Combine configured route and a key into a single object key string."""
         parts = [p.strip("/") for p in (self._route, key) if p and p.strip("/")]
         return "/".join(parts)
@@ -111,7 +110,8 @@ class MongoFileSystemUnitOfWork(AbstractFileSystemUnitOfWork):
         try:
             # Find the most recent file matching filename and route metadata
             cursor = (
-                self._db.fs.files.find({"filename": key, "metadata.route": self._route})
+                self._db.fs.files
+                .find({"filename": key, "metadata.route": self._route})
                 .sort([("uploadDate", -1)])
                 .limit(1)
             )
@@ -140,10 +140,7 @@ class MongoFileSystemUnitOfWork(AbstractFileSystemUnitOfWork):
         else:
             search_prefix = folder_prefix
 
-        if search_prefix:
-            match_prefix = search_prefix + "/"
-        else:
-            match_prefix = ""
+        match_prefix = search_prefix + "/" if search_prefix else ""
 
         try:
             results = []
@@ -155,10 +152,8 @@ class MongoFileSystemUnitOfWork(AbstractFileSystemUnitOfWork):
             for doc in self._db.fs.files.find(query):
                 filename = doc.get("filename", "")
                 # strip the folder prefix and leading slashes
-                if match_prefix:
-                    rel = filename[len(match_prefix) :].lstrip("/")
-                else:
-                    rel = filename
+                rel = filename[len(match_prefix) :].lstrip("/") if match_prefix else filename
+
                 # only include top-level entries (no nested '/'), mimic non-recursive
                 if rel and "/" not in rel:
                     results.append(rel)
@@ -167,7 +162,7 @@ class MongoFileSystemUnitOfWork(AbstractFileSystemUnitOfWork):
             logger.exception("Exception listing objects with prefix '%s' in GridFS.", prefix)
             raise
 
-    def move_file(self, old_file: str, new_file: str, new_route: Optional[str] = None) -> bool:
+    def move_file(self, old_file: str, new_file: str, new_route: str | None = None) -> bool:
         """Copy a file to a new key (and optional new route) then remove the old one.
 
         This implements move semantics by reading the source, writing a new
@@ -181,7 +176,10 @@ class MongoFileSystemUnitOfWork(AbstractFileSystemUnitOfWork):
         try:
             # Read source (take most recent)
             cursor = (
-                self._db.fs.files.find({"filename": old_key, "metadata.route": self._route}).sort([("uploadDate", -1)]).limit(1)
+                self._db.fs.files
+                .find({"filename": old_key, "metadata.route": self._route})
+                .sort([("uploadDate", -1)])
+                .limit(1)
             )
             docs = list(cursor)
             doc = docs[0] if docs else None
@@ -191,12 +189,10 @@ class MongoFileSystemUnitOfWork(AbstractFileSystemUnitOfWork):
             content = src_file.read()
             # Put new file with new metadata
             self._fs.put(content, filename=new_key, metadata={"route": target_route})
-            # Delete all old files that match the old key and old route
-            deleted_any = False
+
             for f in self._db.fs.files.find({"filename": old_key, "metadata.route": self._route}):
                 try:
                     self._fs.delete(f["_id"])
-                    deleted_any = True
                 except Exception:
                     logger.exception("Failed to delete GridFS file id=%s", f.get("_id"))
             return True
@@ -213,7 +209,7 @@ class MongoFileSystemUnitOfWork(AbstractFileSystemUnitOfWork):
         self._route = self._normalize_prefix(route)
         return self._route
 
-    def upload_file(self, file_route: str, name: Optional[str] = None) -> bool:
+    def upload_file(self, file_route: str, name: str | None = None) -> bool:
         """Read a local file and store it in GridFS under the configured route.
 
         If 'name' is not provided, the source file's basename is used.

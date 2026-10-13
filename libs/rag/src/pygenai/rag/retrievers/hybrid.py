@@ -15,17 +15,16 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from itertools import groupby
+
 from pygenai.core.base_retriever import BaseRetriever, RetrievedDocument
 from pygenai.core.data import Chunk, Document
-
 from pygenai.rag.vectorstores.base import VectorStore
 
 
 class HybridRetriever(BaseRetriever):
     """Fuse vector similarity with a lightweight keyword scoring strategy."""
 
-    def __init__(self, vector_store: VectorStore, *, vector_weight: float = 0.7,
-                 keyword_weight: float = 0.3) -> None:
+    def __init__(self, vector_store: VectorStore, *, vector_weight: float = 0.7, keyword_weight: float = 0.3) -> None:
         """Initialize the hybrid ranking weights."""
         self.vector_store = vector_store
         self.vector_weight = vector_weight
@@ -61,7 +60,8 @@ class HybridRetriever(BaseRetriever):
                 continue
             keyword_score = self._keyword_score(query, document)
             candidates[key] = RetrievedDocument(
-                document=document, score=self.keyword_weight * keyword_score, metadata={})
+                document=document, score=self.keyword_weight * keyword_score, metadata={}
+            )
 
         ranked = sorted(candidates.values(), key=lambda result: result.score, reverse=True)[:top_k]
         for index, result in enumerate(ranked, start=1):
@@ -73,9 +73,9 @@ class HybridRetriever(BaseRetriever):
         retrieved_items = self.retrieve(query, top_k=top_k)
         docs_info = [
             (
-                getattr(doc.document, "source", None) or (
-                    doc.metadata.get("source") if hasattr(doc, "metadata") else "unknown"),
-                doc.document.text
+                getattr(doc.document, "source", None)
+                or (doc.metadata.get("source") if hasattr(doc, "metadata") else "unknown"),
+                doc.document.text,
             )
             for item in retrieved_items
             for doc in (item if isinstance(item, list) else [item])

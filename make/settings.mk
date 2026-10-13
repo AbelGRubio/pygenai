@@ -1,4 +1,4 @@
-re# checkmake: ignore-rule maxbodylength
+# checkmake: ignore-rule maxbodylength
 # ──────────────────────────────────────────────────────────────────────────────
 #  Configuration & Variables
 # ──────────────────────────────────────────────────────────────────────────────

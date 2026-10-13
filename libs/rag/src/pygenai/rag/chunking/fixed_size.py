@@ -15,8 +15,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from pygenai.rag.chunking.base import ChunkStrategy
 from pygenai.core.data import Chunk, Document
+from pygenai.rag.chunking.base import ChunkStrategy
 
 
 @dataclass(slots=True)

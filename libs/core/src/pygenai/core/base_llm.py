@@ -46,6 +46,7 @@ class MessageUsage(BaseModel):
     total_tokens: int = Field(default=0, description="Total tokens used")
 
     def __init__(self, **data: Any) -> None:
+        """Initialize MessageUsage and calculate total tokens if not provided."""
         super().__init__(**data)
         if self.total_tokens == 0:
             self.total_tokens = self.prompt_tokens + self.completion_tokens
