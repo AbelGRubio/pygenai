@@ -26,27 +26,6 @@ MCPConnection: TypeAlias = Union[
     StreamableHttpConnection,
     WebsocketConnection
 ]
-from langchain_core.messages.tool import ToolMessage
-
-
-def clean_messages_history(messages: list) -> list:
-    cleaned = []
-    for msg in messages:
-        # 1. Omitir ToolMessages por completo
-        if isinstance(msg, ToolMessage):
-            continue
-
-        # 2. Omitir AIMessages que sean exclusivamente de llamadas a herramientas (content vacío o sin texto útil)
-        if isinstance(msg, AIMessage):
-            is_tool_call_only = (
-                                        not msg.content or (isinstance(msg.content, str) and not msg.content.strip())
-                                ) and getattr(msg, "tool_calls", None)
-
-            if is_tool_call_only:
-                continue
-
-        cleaned.append(msg)
-    return cleaned
 
 
 @dataclass
@@ -105,8 +84,6 @@ class AgentBuilder:
             self._mcp_client = MultiServerMCPClient(self._mcps)  # type: ignore[arg-type]
             self._mcp_manager.current_config_hash = self._mcp_manager._get_hash(self._mcps)
 
-        # await self._mcp_manager.get_active_tools(self._mcps, self._mcp_client)
-
     # --- Node 1: Prepara pregunta para RAG ---
     async def prepare_rag_query_node(self, state: AgentState, config: RunnableConfig) -> dict[str, Any]:
         """Extract the user's latest query and retrieve relevant context from RAG sources."""
@@ -124,8 +101,6 @@ class AgentBuilder:
         last_msg = messages[-1]
         if isinstance(last_msg, HumanMessage):
             rag_query = last_msg.content
-        elif isinstance(last_msg, dict):
-            rag_query = last_msg.get('content', str(last_msg))
         else:
             rag_query = getattr(last_msg, "content", str(last_msg))
 
@@ -146,14 +121,16 @@ class AgentBuilder:
 
         try:
             decision_response = await self._llm.ainvoke([HumanMessage(content=decision_prompt)])
-            decision_text = decision_response.content.strip().upper()
+            decision_text = str(decision_response.content).strip().upper()
 
             if "YES" not in decision_text:
                 return {'session_id': session_id}
-        except Exception:
-            pass
 
-        _, question_ = decision_text.split("YES: ", 1)
+            _, question_ = decision_text.split("YES: ", 1)
+
+        except Exception:
+            question_ = ''
+            pass
 
         for rag_name, rag_retriever in self._rag_sources.items():
             try:
@@ -209,7 +186,7 @@ class AgentBuilder:
             "memory_data": current_context
         }
 
-    # --- Node 4: Llama al nodo de razonar ---
+    # --- Node 3: Call to reasoning llm ---
     async def reasoning_node(self, state: AgentState) -> dict[str, Any]:
         """Execute the core reasoning agent using the prepared RAG texts, tools, and memory."""
         messages = list(state.get("messages", []))
@@ -242,13 +219,13 @@ class AgentBuilder:
 
         # Merge new responses with existing conversation messages
         updated_messages = current_context + [msg for msg in agent_messages if msg not in messages]
-        # clean_messages = clean_messages_history(updated_messages)
+
         return {
             "messages": updated_messages,
             "context": current_context
         }
 
-    # --- Node 5: Guarda la interacción en la memoria a largo plazo---
+    # --- Node 4: Save long memory interaction ---
     async def save_memory_node(self, state: Any) -> dict[str, Any]:
         """Save the latest interaction (user input and assistant response) into memory."""
         if self._memory:
@@ -349,12 +326,11 @@ class AgentBuilder:
         workflow.add_node("prepare_tools", self.prepare_tools_node)
         workflow.add_node("memory_node", self.memory_node) # Memoria largo plazo
         workflow.add_node("reasoning", self.reasoning_node)
-        workflow.add_node("save_memory", self.save_memory_node) # Memoria corto plazo
+        workflow.add_node("save_memory", self.save_memory_node) # Save long memory
 
         # Wire the sequential execution flow
         workflow.set_entry_point("prepare_rag_query")
-        workflow.add_edge("prepare_rag_query", "prepare_tools")
-        workflow.add_edge("prepare_tools", "memory_node")
+        workflow.add_edge("prepare_rag_query", "memory_node")
         workflow.add_edge("memory_node", "reasoning")
         workflow.add_edge("reasoning", "save_memory")
         workflow.add_edge("save_memory", END)

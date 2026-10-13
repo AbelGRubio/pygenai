@@ -98,7 +98,6 @@ class MCPManager:
     """Load and return tools for the active MCP configuration with caching."""
     new_hash = self._get_hash(mcp_config)
 
-    # Si la configuración cambia, cerramos sesiones anteriores y limpiamos caché
     if self.current_config_hash != new_hash:
         await self.close_all()
         self.current_config_hash = new_hash
@@ -109,10 +108,6 @@ class MCPManager:
     all_tools: list[Any] = []
     for server_name in mcp_config.keys():
       try:
-        # Usamos el gestor de sesión individual recomendado por langchain-mcp-adapters
-        # async with mcp_client.session(server_name) as session:
-        #   server_tools = await load_mcp_tools(session)
-        #   all_tools.extend(server_tools)
         all_tools = await mcp_client.get_tools()
       except Exception as server_err:
         logger.error(
