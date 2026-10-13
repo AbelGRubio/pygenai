@@ -2,7 +2,7 @@
 
 import uvicorn
 
-from pygenai.app import define_app
+from pygenai.agent.app import define_app
 from pygenai.core.logger import get_logger, propague_loggers
 
 logger = get_logger(__name__)

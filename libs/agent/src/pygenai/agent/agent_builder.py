@@ -24,8 +24,8 @@ from typing_extensions import TypedDict
 from pygenai.core.base_memory import MemoryTypes
 from pygenai.core.base_retriever import BaseRetriever
 from pygenai.core.logger import get_logger
-from pygenai.settings import get_settings
-from pygenai.utils.mcp_manager import get_mcp_manager
+from pygenai.agent.settings import get_settings
+from pygenai.agent.utils.mcp_manager import get_mcp_manager
 
 logger = get_logger(__name__)
 MCPConnection: TypeAlias = StdioConnection | SSEConnection | StreamableHttpConnection | WebsocketConnection  # noqa: UP040

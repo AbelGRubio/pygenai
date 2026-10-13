@@ -19,6 +19,7 @@ dependencies = [
   "pygenai-llm",
   "pygenai-rag",
   "pygenai-core",
+  "pygenai-agent"
 ]
 
 [project.optional-dependencies]
@@ -33,6 +34,9 @@ rag = [
 ]
 core = [
     "pygenai-core",
+]
+agent = [
+    "pygenai-agent",
 ]
 
 [dependency-groups]
@@ -58,13 +62,15 @@ pygenai-core = { workspace = true }
 pygenai-llm = { workspace = true }
 pygenai-memory = { workspace = true }
 pygenai-rag = { workspace = true }
+pygenai-agent = { workspace = true }
 
 [tool.uv.workspace]
 members = [
     "libs/core",
     "libs/llm",
     "libs/memory",
-    "libs/rag"
+    "libs/rag",
+    "libs/agent",
 ]
 
 [tool.pytest.ini_options]
@@ -76,7 +82,8 @@ pythonpath = [
     "libs/memory/src",
     "libs/core/src",
     "libs/llm/src",
-    "libs/rag/src"
+    "libs/rag/src",
+    "libs/agent/src"
 ]
 addopts = [
     "-n",
@@ -86,6 +93,7 @@ addopts = [
     "--cov=libs/llm/src",
     "--cov=libs/rag/src",
     "--cov=libs/core/src",
+    "--cov=libs/agent/src",
     "--cov-report=xml",
     "--cov-report=json",
     "--cov-report=html",

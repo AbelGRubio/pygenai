@@ -7,17 +7,15 @@ Prometheus metrics instrumentation.
 
 import json
 import os
-import sys
 from functools import lru_cache
 
+# sys.path.insert(0, os.path.abspath("src"))
+from langgraph_api.server import app as langgraph_app
 from starlette.applications import Starlette
 from starlette.middleware.cors import CORSMiddleware
 
 from pygenai.core.logger import get_logger
 from pygenai.core.middlewares.auth import AuthMiddleware
-
-sys.path.insert(0, os.path.abspath("src"))
-from langgraph_api.server import app as langgraph_app
 
 logger = get_logger(__name__)
 

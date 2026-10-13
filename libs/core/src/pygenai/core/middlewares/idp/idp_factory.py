@@ -2,9 +2,9 @@
 
 import os
 
-from observe_core.logger import get_logger
-from observe_core.security.idp.idp_adapter import IDPAdapter
-from observe_core.security.idp.keycloak_adapter import KeycloakAdapter
+from pygenai.core.logger import get_logger
+from pygenai.core.middlewares.idp.idp_adapter import IDPAdapter
+from pygenai.core.middlewares.idp.keycloak_adapter import KeycloakAdapter
 
 logger = get_logger(__name__)
 

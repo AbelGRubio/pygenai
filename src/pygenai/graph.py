@@ -4,14 +4,14 @@ from pathlib import Path
 
 from langchain_mcp_adapters.sessions import StreamableHttpConnection
 
-from pygenai.agent_builder import AgentBuilder
+from pygenai.agent.agent_builder import AgentBuilder
+from pygenai.agent.settings import get_settings
 from pygenai.core.logger import get_logger
 from pygenai.memory.buffer_memory import BufferMemory
 from pygenai.rag.chunking import FixedSizeChunker
 from pygenai.rag.loaders import TextLoader
 from pygenai.rag.retrievers import HybridRetriever
 from pygenai.rag.vectorstores import InMemoryVectorStore
-from pygenai.settings import get_settings
 
 logger = get_logger(__name__)
 settings = get_settings()

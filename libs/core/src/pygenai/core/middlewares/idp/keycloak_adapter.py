@@ -3,7 +3,7 @@
 from typing import Any, ClassVar
 
 import jwt
-from observe_core.security.idp.idp_adapter import IDPAdapter
+from pygenai.core.middlewares.idp.idp_adapter import IDPAdapter
 
 
 class KeycloakAdapter(IDPAdapter):
