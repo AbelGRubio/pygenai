@@ -13,8 +13,8 @@ Copyright ©2026 All rights reserved.
 
 from __future__ import annotations
 
-from pygenai.core.data import Chunk, Document
 from pygenai.core.base_retriever import RetrievedDocument
+from pygenai.core.data import Chunk, Document
 from pygenai.rag.retrievers.rerank import Reranker
 
 

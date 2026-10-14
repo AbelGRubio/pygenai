@@ -36,14 +36,18 @@ class ChromaVectorStore(VectorStore):
         self._client = client
         self.collection_name = collection_name
 
-    def add_documents(self, documents: Sequence[Document | Chunk], *, embeddings: Sequence[Sequence[float]] | None = None) -> list[str]:
+    def add_documents(
+        self, documents: Sequence[Document | Chunk], *, embeddings: Sequence[Sequence[float]] | None = None
+    ) -> list[str]:
         """Add documents to a Chroma collection."""
         del embeddings
         return [getattr(document, "id", f"chroma-{index}") for index, document in enumerate(documents)]
 
-    def similarity_search(self, query: str, k: int = 5, *, filter: dict[str, Any] | None = None) -> list[SearchHit]:
+    def similarity_search(
+        self, query: str, k: int = 5, *, filter_search: dict[str, Any] | None = None
+    ) -> list[SearchHit]:
         """Query a Chroma collection for nearby chunks or documents."""
-        del query, k, filter
+        del query, k, filter_search
         return []
 
     def delete(self, ids: Sequence[str]) -> None:

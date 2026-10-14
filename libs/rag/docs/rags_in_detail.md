@@ -20,7 +20,7 @@ To understand RAG components, imagine a **massive library with a sophisticated r
 
 **Purpose**: Data ingestion layer that reads documents from various sources and standardizes them.
 
-**Key Responsibility**: 
+**Key Responsibility**:
 - Read files from different formats (PDF, Markdown, CSV, Text, Web content)
 - Convert all documents into a standard `Document` class
 - Preserve metadata (source, page number, etc.)
@@ -79,17 +79,17 @@ Raw documents are often too large for embedding models. A 100-page PDF or a larg
   - Splits documents into chunks of a fixed token/character count
   - Simple but may break sentences or paragraphs
   - Best for: Uniform content distribution
-  
+
 - **Token-Based Chunking** (`token.py`):
   - Uses token counting (e.g., from tokenizers) to ensure chunks fit within model limits
   - More precise for language models
   - Best for: Respecting LLM token limits
-  
+
 - **Semantic Chunking** (`semantic.py`):
   - Groups sentences/sections by meaning and topic similarity
   - Uses embeddings to preserve semantic boundaries
   - Best for: Maintaining coherent meaning across chunks
-  
+
 - **Structural Chunking** (`structure.py`):
   - Respects document structure (chapters, sections, headers)
   - Preserves hierarchical organization
@@ -138,7 +138,7 @@ Embeddings are the **"secret language"** that allows machines to understand mean
   - State-of-the-art semantic understanding
   - Best for: Production systems requiring high-quality embeddings
   - Requires: OpenAI API key
-  
+
 - **Simple Embeddings** (`simple.py`):
   - Lightweight, local implementation (e.g., using open-source models)
   - No external API calls
@@ -190,23 +190,23 @@ A vector store is the **"organized library shelf"** where embeddings are stored 
   - Stores embeddings in memory using list operations
   - Best for: Development, testing, small datasets
   - Trade-off: No persistence, no advanced indexing
-  
+
 - **FAISS** (`faiss.py`):
   - Facebook's vector search library
   - Efficient similarity search and clustering
   - Best for: Large-scale, high-performance scenarios
   - Features: Multiple index types, GPU acceleration available
-  
+
 - **Chroma** (`chroma.py`):
   - Modern vector database for AI applications
   - Built-in persistence and metadata filtering
   - Best for: Production RAG systems with metadata requirements
-  
+
 - **Pinecone** (`pinecone.py`):
   - Cloud-hosted vector database
   - Fully managed, serverless
   - Best for: Scalable production systems (no infrastructure management)
-  
+
 - **Qdrant** (`qdrant.py`):
   - Vector database with payload filtering
   - Open-source or cloud-hosted
@@ -269,23 +269,23 @@ A retriever is the **"efficient librarian"** who knows the library's rules and c
   - Queries the vector store directly
   - Best for: Semantic matching based on meaning
   - Example: "Find documents similar to this query"
-  
+
 - **Hybrid Retriever** (`hybrid.py`):
   - Combines multiple retrieval methods
   - Can mix vector search with keyword/BM25 search
   - Best for: Improving recall and precision
   - Example: "Find documents that are both semantically similar AND contain these keywords"
-  
+
 - **Reranking Retrievers** (`rerank.py`):
   - Apply a secondary model to reorder results
   - Improves result quality by re-evaluating initial candidates
   - Best for: High-quality ranking requirements
-  
+
 - **Cross-Encoder Reranker** (`cross_encoder.py`):
   - Uses cross-encoder models to score document relevance
   - More accurate than vector similarity alone
   - Best for: Final ranking when precision is critical
-  
+
 - **No-op Reranker** (`noop_reranker.py`):
   - Utility reranker that doesn't modify results
   - Best for: Testing and baseline comparisons
@@ -334,19 +334,19 @@ Here's how all components work together:
 1. LOAD DOCUMENTS (Loaders)
    ↓
    Raw files (PDF, MD, TXT, CSV, Web) → Document objects
-   
+
 2. CHUNK DOCUMENTS (Chunking)
    ↓
    Large documents → Smaller, manageable chunks
-   
+
 3. EMBED CHUNKS (Embeddings)
    ↓
    Text chunks → Numerical vectors (semantic representation)
-   
+
 4. STORE EMBEDDINGS (VectorStore)
    ↓
    Embeddings + metadata → Organized, indexed storage
-   
+
 5. RETRIEVE ON QUERY (Retrievers)
    ↓
    User question → Vector → Search vector store → Rank results

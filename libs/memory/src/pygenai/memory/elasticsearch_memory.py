@@ -1,7 +1,6 @@
 """Elasticsearch-based semantic search for conversation memory."""
 
 from elasticsearch import Elasticsearch
-
 from pygenai.core.base_memory import SemanticSearchAdapter
 from pygenai.core.models import Message
 
@@ -64,7 +63,7 @@ class ElasticsearchMemory(SemanticSearchAdapter):
                 "mappings": {
                     "properties": {
                         "message_id": {"type": "keyword"},
-                        "role": {"type": "keyword"},
+                        "type": {"type": "keyword"},
                         "content": {"type": "text"},
                         "tokens": {"type": "integer"},
                         "timestamp": {"type": "date"},
@@ -87,7 +86,7 @@ class ElasticsearchMemory(SemanticSearchAdapter):
 
         doc = {
             "message_id": message.id,
-            "role": message.role.value,
+            "type": message.type,
             "content": message.content,
             "tokens": message.tokens,
             "timestamp": message.timestamp.isoformat(),
@@ -96,9 +95,7 @@ class ElasticsearchMemory(SemanticSearchAdapter):
 
         self._client.index(index=index_name, id=message.id, body=doc)
 
-    async def search(
-        self, session_id: str, query: str, top_k: int = 5
-    ) -> list[Message]:
+    async def search(self, session_id: str, query: str, top_k: int = 5) -> list[Message]:
         """
         Search for semantically similar messages.
 
@@ -133,7 +130,7 @@ class ElasticsearchMemory(SemanticSearchAdapter):
             source = hit["_source"]
             message = Message(
                 id=source["message_id"],
-                role=source["role"],
+                type=source["type"],
                 content=source["content"],
                 tokens=source.get("tokens", 0),
                 metadata=source.get("metadata", {}),

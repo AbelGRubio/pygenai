@@ -36,14 +36,18 @@ class PineconeVectorStore(VectorStore):
         self._client = client
         self.index_name = index_name
 
-    def add_documents(self, documents: Sequence[Document | Chunk], *, embeddings: Sequence[Sequence[float]] | None = None) -> list[str]:
+    def add_documents(
+        self, documents: Sequence[Document | Chunk], *, embeddings: Sequence[Sequence[float]] | None = None
+    ) -> list[str]:
         """Add documents to the target index."""
         del embeddings
         return [getattr(document, "id", f"pinecone-{index}") for index, document in enumerate(documents)]
 
-    def similarity_search(self, query: str, k: int = 5, *, filter: dict[str, Any] | None = None) -> list[SearchHit]:
+    def similarity_search(
+        self, query: str, k: int = 5, *, filter_search: dict[str, Any] | None = None
+    ) -> list[SearchHit]:
         """Query a Pinecone index for close vectors."""
-        del query, k, filter
+        del query, k, filter_search
         return []
 
     def delete(self, ids: Sequence[str]) -> None:

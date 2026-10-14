@@ -43,7 +43,9 @@ class FAISSVectorStore(VectorStore):
         else:
             self._index = faiss.IndexFlatIP(dimension)
 
-    def add_documents(self, documents: Sequence[Document | Chunk], *, embeddings: Sequence[Sequence[float]] | None = None) -> list[str]:
+    def add_documents(
+        self, documents: Sequence[Document | Chunk], *, embeddings: Sequence[Sequence[float]] | None = None
+    ) -> list[str]:
         """Add documents and embeddings to the FAISS index."""
         if embeddings is None:
             msg = "FAISS requires explicit embeddings to build the index."
@@ -59,7 +61,9 @@ class FAISSVectorStore(VectorStore):
             self._ids.append(getattr(document, "id", f"vector-{len(self._ids)}"))
         return self._ids[-len(documents) :]
 
-    def similarity_search(self, query: str, k: int = 5, *, filter: dict[str, Any] | None = None) -> list[SearchHit]:
+    def similarity_search(
+        self, query: str, k: int = 5, *, filter_search: dict[str, Any] | None = None
+    ) -> list[SearchHit]:
         """Find documents by querying the FAISS index using an embedding vector."""
         raise NotImplementedError("FAISS search requires the application layer to supply an embedding model.")
 

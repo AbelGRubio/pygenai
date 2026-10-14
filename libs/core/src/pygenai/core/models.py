@@ -9,7 +9,7 @@ from typing import Any
 from uuid import uuid4
 
 from langchain_core.messages import BaseMessage
-
+from pydantic import BaseModel
 
 class MessageRole(StrEnum):
     """Role of the message sender."""
@@ -20,8 +20,7 @@ class MessageRole(StrEnum):
 
 
 class Message(BaseMessage):
-    """
-    Represents a single message in a conversation.
+    """Represents a single message in a conversation.
 
     Attributes:
         id: Unique identifier for the message.
@@ -36,12 +35,26 @@ class Message(BaseMessage):
     metadata: dict[str, Any] = field(default_factory=dict)
     timestamp: datetime = field(default_factory=datetime.utcnow)
 
+    def to_dict(self) -> dict[str, Any]:
+        """Convert message to dictionary."""
+        return {
+            "token": self.tokens,
+            "metadata": self.metadata,
+            "timestamp": self.timestamp.isoformat(),
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> SummaryRecord:
+        """Create summary from dictionary."""
+        return cls(
+            tokens=data.get("tokens", 0),
+            metadata=data.get("metadata", {}),
+            timestamp=datetime.fromisoformat(data["timestamp"])
+        )
 
 
-@dataclass
-class SummaryRecord:
-    """
-    Represents a compressed summary of past conversation segments.
+class SummaryRecord(BaseModel):
+    """Represents a compressed summary of past conversation segments.
 
     Attributes:
         id: Unique identifier for the summary.
@@ -60,35 +73,17 @@ class SummaryRecord:
     timestamp: datetime = field(default_factory=datetime.utcnow)
 
     def to_dict(self) -> dict[str, Any]:
-        """Convert summary to dictionary."""
-        return {
-            "id": self.id,
-            "summary": self.summary,
-            "messages_count": self.messages_count,
-            "original_tokens": self.original_tokens,
-            "metadata": self.metadata,
-            "timestamp": self.timestamp.isoformat(),
-        }
+        """Convert summary to dictionary (compatible wrapper for Pydantic v2)."""
+        return self.model_dump()
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> SummaryRecord:
-        """Create summary from dictionary."""
-        return cls(
-            id=data.get("id", str(uuid4())),
-            summary=data["summary"],
-            messages_count=data.get("messages_count", 0),
-            original_tokens=data.get("original_tokens", 0),
-            metadata=data.get("metadata", {}),
-            timestamp=datetime.fromisoformat(data["timestamp"])
-            if isinstance(data.get("timestamp"), str)
-            else data.get("timestamp", datetime.utcnow()),
-        )
+    def from_dict(cls, data: dict[str, Any]) -> "SummaryRecord":
+        """Create summary from dictionary (compatible wrapper for Pydantic v2)."""
+        return cls.model_validate(data)
 
 
-@dataclass
-class ConversationState:
-    """
-    Represents the complete state of a conversation.
+class ConversationState(BaseModel):
+    """Represents the complete state of a conversation.
 
     Attributes:
         session_id: Unique session identifier.
@@ -104,6 +99,14 @@ class ConversationState:
     total_tokens: int = 0
     metadata: dict[str, Any] = field(default_factory=dict)
 
+    def to_dict(self) -> dict[str, Any]:
+        """Convert summary to dictionary (compatible wrapper for Pydantic v2)."""
+        return self.model_dump()
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "SummaryRecord":
+        """Create summary from dictionary (compatible wrapper for Pydantic v2)."""
+        return cls.model_validate(data)
 
 
 @dataclass(slots=True)
@@ -120,7 +123,7 @@ class Document:
     metadata: dict[str, Any] = field(default_factory=dict)
     source: str | None = None
 
-    def as_chunk(self, *, index: int = 0, start: int = 0, end: int | None = None) -> "Chunk":
+    def as_chunk(self, *, index: int = 0, start: int = 0, end: int | None = None) -> Chunk:
         """Convert the document into a chunk with the same content.
 
         Args:

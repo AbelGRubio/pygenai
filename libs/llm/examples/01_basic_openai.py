@@ -29,6 +29,7 @@ if not OPENAI_API_KEY:
 
 litellm._turn_on_debug()
 
+
 async def main() -> None:
     """Run basic OpenAI example."""
     # Create provider configuration
@@ -57,7 +58,7 @@ async def main() -> None:
     print(f"   {response.content}\n")
     print(f"💰 Cost: ${response.cost:.6f}")
     print(f"📊 Tokens: {response.usage.prompt_tokens} prompt + {response.usage.completion_tokens} completion")
-    print(f"\n📈 Cumulative Statistics:")
+    print("\n📈 Cumulative Statistics:")
     print(f"   Total cost: ${response.cost:.6f}")
 
 

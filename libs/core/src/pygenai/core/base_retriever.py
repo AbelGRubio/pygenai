@@ -40,4 +40,5 @@ class BaseRetriever(ABC):
         """Retrieve documents and format them for downstream consumption."""
         raise NotImplementedError
 
+
 __all__ = ["BaseRetriever", "RetrievedDocument"]

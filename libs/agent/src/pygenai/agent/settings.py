@@ -3,7 +3,7 @@
 from functools import lru_cache
 
 from pydantic import Field, SecretStr
-from pydantic_settings import SettingsConfigDict, BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 __version__ = "0.1.0"
 
@@ -30,6 +30,7 @@ class AgentSettings(BaseSettings):
         populate_by_name=True,
         extra="ignore",
     )
+
 
 @lru_cache(maxsize=1)
 def get_settings() -> AgentSettings:

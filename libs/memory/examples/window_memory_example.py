@@ -2,8 +2,9 @@
 
 import asyncio
 
-from pygenai.memory import Message, MessageRole, WindowMemory
-
+from pygenai.memory import WindowMemory
+from pygenai.core.base_memory import Message
+from pygenai.core.models import MessageRole
 
 async def main():
     """Demonstrate WindowMemory usage with token and turn limits."""
@@ -34,17 +35,15 @@ async def main():
 
     # Display final state
     final_state = await memory.get_state(session_id)
-    print(f"\nFinal Window State:")
+    print("\nFinal Window State:")
     print(f"  Messages in window: {len(final_state.messages)}")
     print(f"  Total tokens: {final_state.total_tokens}")
-    print(f"  Max tokens allowed: {memory._max_tokens}")
-    print(f"  Max turns allowed: {memory._max_turns}")
 
     # Show messages in window
-    print(f"\nMessages in window:")
+    print("\nMessages in window:")
     for msg in final_state.messages[-3:]:  # Show last 3
         preview = msg.content[:50]
-        print(f"  - {msg.role.value}: {preview}...")
+        print(f"  - {msg.type}: {preview}...")
 
 
 if __name__ == "__main__":

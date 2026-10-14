@@ -24,11 +24,15 @@ class VectorStore(ABC):
     """Abstract interface used by retrievers to query embeddings."""
 
     @abstractmethod
-    def add_documents(self, documents: Sequence[Document | Chunk], *, embeddings: Sequence[Sequence[float]] | None = None) -> list[str]:
+    def add_documents(
+        self, documents: Sequence[Document | Chunk], *, embeddings: Sequence[Sequence[float]] | None = None
+    ) -> list[str]:
         """Add a collection of documents and optional precomputed embeddings."""
 
     @abstractmethod
-    def similarity_search(self, query: str, k: int = 5, *, filter: dict[str, Any] | None = None) -> list[SearchHit]:
+    def similarity_search(
+        self, query: str, k: int = 5, *, filter_search: dict[str, Any] | None = None
+    ) -> list[SearchHit]:
         """Return the best matching documents for a query."""
 
     @abstractmethod

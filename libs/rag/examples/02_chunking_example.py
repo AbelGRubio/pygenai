@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from pygenai.rag.chunking import FixedSizeChunker, TokenChunker
 from pygenai.core.data import Document
+from pygenai.rag.chunking import FixedSizeChunker, TokenChunker
 
 
 def main() -> None:

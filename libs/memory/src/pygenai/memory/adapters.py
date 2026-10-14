@@ -4,14 +4,13 @@ import json
 
 import psycopg
 import redis
-
 from pygenai.core.base_memory import PersistenceAdapter
 from pygenai.core.models import ConversationState
 
 
 class InMemoryAdapter(PersistenceAdapter):
     """
-    In-memory persistence adapter for development and testing.
+    In-memory persistence adapter fora development and testing.
 
     Stores conversation state in RAM. Data is lost when the process terminates.
     """
@@ -71,8 +70,7 @@ class RedisAdapter(PersistenceAdapter):
     Suitable for active sessions in production with automatic expiration.
     """
 
-    def __init__(self, host: str = "localhost", port: int = 6379, db: int = 0,
-                 ttl: int | None = None):
+    def __init__(self, host: str = "localhost", port: int = 6379, db: int = 0, ttl: int | None = None):
         """
         Initialize RedisAdapter.
 
@@ -180,13 +178,16 @@ class PostgreSQLAdapter(PersistenceAdapter):
         """
         with psycopg.connect(self._conninfo) as conn, conn.cursor() as cur:
             data = json.dumps(state.to_dict())
-            cur.execute("""
+            cur.execute(
+                """
                 INSERT INTO conversation_sessions (session_id, data)
                 VALUES (%s, %s)
                 ON CONFLICT (session_id) DO UPDATE SET
                 data = EXCLUDED.data,
                 updated_at = CURRENT_TIMESTAMP
-            """, (session_id, data))
+            """,
+                (session_id, data),
+            )
             conn.commit()
 
     async def load(self, session_id: str) -> ConversationState | None:
@@ -200,10 +201,7 @@ class PostgreSQLAdapter(PersistenceAdapter):
             The conversation state or None if not found.
         """
         with psycopg.connect(self._conninfo) as conn, conn.cursor() as cur:
-            cur.execute(
-                "SELECT data FROM conversation_sessions WHERE session_id = %s",
-                (session_id,)
-            )
+            cur.execute("SELECT data FROM conversation_sessions WHERE session_id = %s", (session_id,))
             row = cur.fetchone()
             if not row:
                 return None
@@ -217,10 +215,7 @@ class PostgreSQLAdapter(PersistenceAdapter):
             session_id: The session identifier.
         """
         with psycopg.connect(self._conninfo) as conn, conn.cursor() as cur:
-            cur.execute(
-                "DELETE FROM conversation_sessions WHERE session_id = %s",
-                (session_id,)
-            )
+            cur.execute("DELETE FROM conversation_sessions WHERE session_id = %s", (session_id,))
             conn.commit()
 
     async def exists(self, session_id: str) -> bool:
@@ -234,8 +229,5 @@ class PostgreSQLAdapter(PersistenceAdapter):
             True if session exists.
         """
         with psycopg.connect(self._conninfo) as conn, conn.cursor() as cur:
-            cur.execute(
-                "SELECT 1 FROM conversation_sessions WHERE session_id = %s LIMIT 1",
-                (session_id,)
-            )
+            cur.execute("SELECT 1 FROM conversation_sessions WHERE session_id = %s LIMIT 1", (session_id,))
             return cur.fetchone() is not None

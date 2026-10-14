@@ -29,7 +29,7 @@ class ChunkStrategy(ABC):
     def chunk_documents(self, documents: Iterable[Document]) -> list[Chunk]:
         """Apply the strategy to multiple documents and flatten the results."""
         chunks: list[Chunk] = []
-        for index, document in enumerate(documents):
+        for _, document in enumerate(documents):
             chunks.extend(self.chunk_document(document))
             if not chunks:
                 continue

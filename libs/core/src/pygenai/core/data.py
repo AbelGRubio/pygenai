@@ -34,7 +34,7 @@ class Document:
     metadata: dict[str, Any] = field(default_factory=dict)
     source: str | None = None
 
-    def as_chunk(self, *, index: int = 0, start: int = 0, end: int | None = None) -> "Chunk":
+    def as_chunk(self, *, index: int = 0, start: int = 0, end: int | None = None) -> Chunk:
         """Convert the document into a chunk with the same content.
 
         Args:
@@ -87,7 +87,7 @@ class SearchHit:
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
-def to_langchain_document(value: "Document | Chunk | LangChainDocument") -> LangChainDocument:
+def to_langchain_document(value: Document | Chunk | LangChainDocument) -> LangChainDocument:
     """Convert a document-like object into a langchain_core Document."""
     metadata = dict(getattr(value, "metadata", {}) or {})
     text = getattr(value, "text", None)
@@ -111,7 +111,12 @@ def to_langchain_document(value: "Document | Chunk | LangChainDocument") -> Lang
 
 def from_langchain_document(value: LangChainDocument) -> Document:
     """Convert a langchain_core Document to the package's typed model."""
-    document_id = getattr(value, "id", None) or value.metadata.get("document_id") or value.metadata.get("doc_id") or "langchain-doc"
+    document_id = (
+        getattr(value, "id", None)
+        or value.metadata.get("document_id")
+        or value.metadata.get("doc_id")
+        or "langchain-doc"
+    )
     return Document(
         id=str(document_id),
         text=value.page_content,

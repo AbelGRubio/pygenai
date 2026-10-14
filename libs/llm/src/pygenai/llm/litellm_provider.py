@@ -19,6 +19,7 @@ import litellm
 from pygenai.core.base_llm import LLMProvider, LLMResponse, Message, MessageUsage, ProviderConfig
 from pygenai.llm.exceptions import AuthenticationError, ConfigurationError, InvalidResponseError, ProviderError
 
+
 class LiteLLMProvider(LLMProvider):
     """Unified LLM provider implementation using LiteLLM."""
 
@@ -107,4 +108,4 @@ class LiteLLMProvider(LLMProvider):
             )
 
         except Exception as e:
-            raise ProviderError("litellm", str(e), e)
+            raise ProviderError("litellm", str(e), e) from e

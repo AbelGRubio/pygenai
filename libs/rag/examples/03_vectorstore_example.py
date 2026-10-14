@@ -12,7 +12,9 @@ def main() -> None:
     store = InMemoryVectorStore()
     documents = [
         LangChainDocument(page_content="The quick brown fox jumps over the lazy dog.", metadata={"section": "animals"}),
-        LangChainDocument(page_content="Python is a programming language used in AI and data work.", metadata={"section": "tech"}),
+        LangChainDocument(
+            page_content="Python is a programming language used in AI and data work.", metadata={"section": "tech"}
+        ),
     ]
 
     store.add_documents(documents)

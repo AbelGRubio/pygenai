@@ -1,4 +1,5 @@
-"""Public export surface for the Pygenai memory package.
+"""
+Public export surface for the Pygenai memory package.
 
 ========================================================================================================================
 Name:         pygenai/memory/__init__.py
@@ -13,20 +14,19 @@ Copyright ©2026 All rights reserved.
 
 from __future__ import annotations
 
-from .adapters import InMemoryAdapter, PostgreSQLAdapter, RedisAdapter
+from .adapters import InMemoryAdapter, PostgreSQLAdapter, RedisAdapter, PersistenceAdapter
 from .buffer_memory import BufferMemory
 from .elasticsearch_memory import ElasticsearchMemory
 from .summarized_memory import SummarizedMemory
-from .token_counter import TokenCounter
 from .window_memory import WindowMemory
 
 __all__ = [
     "BufferMemory",
     "ElasticsearchMemory",
     "InMemoryAdapter",
+    "PersistenceAdapter",
     "PostgreSQLAdapter",
     "RedisAdapter",
     "SummarizedMemory",
-    "TokenCounter",
     "WindowMemory",
 ]

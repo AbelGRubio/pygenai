@@ -11,7 +11,9 @@ def main() -> None:
     """Run semantic and hybrid retrieval over a tiny dataset."""
     store = InMemoryVectorStore()
     store.add_documents([
-        Document(id="p1", text="Python is used for data analysis and machine learning.", metadata={"category": "science"}),
+        Document(
+            id="p1", text="Python is used for data analysis and machine learning.", metadata={"category": "science"}
+        ),
         Document(id="p2", text="Cats are known for being independent pets.", metadata={"category": "animals"}),
     ])
 

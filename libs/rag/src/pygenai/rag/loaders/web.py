@@ -46,7 +46,7 @@ class WebLoader(DocumentLoader):
     def load(self, source: str | Path, *, encoding: str = "utf-8") -> list[Document]:
         """Fetch a web page and create a single document from its content."""
         url = str(source)
-        with request.urlopen(request.Request(url, headers={"User-Agent": "pygenai-rag/1.0"})) as response:
+        with request.urlopen(request.Request(url, headers={"User-Agent": "pygenai-rag/1.0"})) as response:  # noqa: S310
             raw_html = response.read().decode(encoding, errors="replace")
 
         parser = _HTMLTextExtractor()

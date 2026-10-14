@@ -8,8 +8,8 @@ shared across vector stores and retrievers.
 from __future__ import annotations
 
 from .base import BaseEmbeddings
-from .simple import SimpleEmbeddings
 from .litellm import LiteLLMEmbeddings
+from .simple import SimpleEmbeddings
 
 __all__ = [
     "BaseEmbeddings",

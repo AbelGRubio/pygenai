@@ -13,7 +13,6 @@ from __future__ import annotations
 from pathlib import Path
 
 from pygenai.rag.chunking import FixedSizeChunker
-from pygenai.core.data import Document
 from pygenai.rag.loaders import TextLoader
 from pygenai.rag.retrievers import HybridRetriever
 from pygenai.rag.vectorstores import InMemoryVectorStore

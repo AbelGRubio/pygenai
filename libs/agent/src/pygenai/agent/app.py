@@ -7,20 +7,20 @@ Prometheus metrics instrumentation.
 
 import json
 import os
-import sys
-# from fastapi.middleware.cors import CORSMiddleware
 from functools import lru_cache
 
-# from observe_core import SessionMiddleware
-# from prometheus_fastapi_instrumentator import Instrumentator
+# sys.path.insert(0, os.path.abspath("src"))
+from langgraph_api.server import app as langgraph_app
 from starlette.applications import Starlette
+from starlette.middleware.cors import CORSMiddleware
 
 from pygenai.core.logger import get_logger
-
-sys.path.insert(0, os.path.abspath("src"))
-from langgraph_api.server import app as langgraph_app
+from pygenai.core.middlewares.auth import AuthMiddleware
 
 logger = get_logger(__name__)
+
+LANGGRAPH_JSON_FILENAME = "langgraph.json"
+LANGSERVE_GRAPHS = "LANGSERVE_GRAPHS"
 
 
 def load_config() -> dict:
@@ -31,11 +31,11 @@ def load_config() -> dict:
     """
     graphs = {}
     try:
-        with open("langgraph.json", encoding="utf-8") as f:
+        with open(LANGGRAPH_JSON_FILENAME, encoding="utf-8") as f:
             config_data = json.load(f)
 
         graphs = config_data.get("graphs", {})
-        os.environ["LANGSERVE_GRAPHS"] = json.dumps(graphs)
+        os.environ[LANGSERVE_GRAPHS] = json.dumps(graphs)
 
         logger.info(f"Graph file loaded: {graphs}")
     except FileNotFoundError as e:
@@ -56,20 +56,16 @@ def define_app(add_auth: bool = False) -> Starlette:
     """
     load_config()
 
-    # langgraph_app.add_middleware(SessionMiddleware)
+    if add_auth:
+        langgraph_app.add_middleware(AuthMiddleware)
 
-    # if add_auth:
-    #     langgraph_app.add_middleware(AuthMiddleware)
-
-    # langgraph_app.add_middleware(
-    #     CORSMiddleware,
-    #     allow_origins=["*"],
-    #     allow_credentials=True,
-    #     allow_methods=["*"],
-    #     allow_headers=["*"],
-    # )
-
-    # Instrumentator().instrument(langgraph_app).expose(langgraph_app)
+    langgraph_app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     logger.info("Define fastapi server.")
     return langgraph_app
