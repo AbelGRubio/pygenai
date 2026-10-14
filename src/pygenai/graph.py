@@ -3,7 +3,9 @@
 from pathlib import Path
 from typing import Any
 
-from pygenai.agent.agent_definition import BaseAgentDefinition
+from langchain_mcp_adapters.sessions import StreamableHttpConnection
+
+from pygenai.agent.base_definition import BaseAgentDefinition
 from pygenai.memory.buffer_memory import BufferMemory
 from pygenai.rag.chunking import FixedSizeChunker
 from pygenai.rag.loaders import TextLoader
@@ -33,6 +35,10 @@ class DemoCopilotAgent(BaseAgentDefinition):
         retriever = HybridRetriever(store)
 
         return {"demo_source": retriever}
+
+    def configure_mcps(self) -> dict[str, Any]:
+        """MCP connections are configured for this demo agent."""
+        return {"demo_mcp": StreamableHttpConnection(url="http://localhost:8000/mcp", transport="streamable_http")}
 
 
 # Starting point to create the agent graph based on the DemoCopilotAgent definition.

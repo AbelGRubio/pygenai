@@ -1,0 +1,7 @@
+Analyze if the following user query requires external knowledge retrieval from a document database to provide an accurate answer.
+Original query: '{{ rag_query }}'
+
+Formatting instructions:
+- If it requires external documents, respond strictly with 'YES: ' followed by the reformulated query.
+- If it does NOT, respond solely with 'NO'.
+- Do not include explanations.

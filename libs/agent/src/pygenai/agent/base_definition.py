@@ -1,7 +1,7 @@
 """Base class for defining modular agents declaratively."""
 from abc import ABC
 from typing import Any
-from pygenai.agent.agent_builder import AgentBuilder
+from pygenai.agent.builder import AgentBuilder
 from langgraph.graph.state import CompiledStateGraph
 
 

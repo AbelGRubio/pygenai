@@ -22,6 +22,14 @@ from pygenai.core.base_retriever import BaseRetriever
 from pygenai.core.logger import get_logger
 from pygenai.agent.models import AgentState
 
+from jinja2 import Environment, PackageLoader, select_autoescape
+
+# Configuración del entorno de Jinja para buscar en el paquete pygenai.agent.prompts
+env = Environment(
+    loader=PackageLoader("pygenai.agent", "prompts"),
+    autoescape=select_autoescape()
+)
+
 logger = get_logger(__name__)
 MCPConnection: TypeAlias = StdioConnection | SSEConnection | StreamableHttpConnection | WebsocketConnection
 
@@ -66,15 +74,8 @@ class AgentNodeExecutor:
             else getattr(last_msg, "content", str(last_msg))
         rag_texts = []
 
-        decision_prompt = (
-            "Analyze if the following user query requires external knowledge retrieval "
-            "from a document database to provide an accurate answer.\n"
-            f"Original query: '{rag_query}'\n\n"
-            "Formatting instructions:\n"
-            "- If it requires external documents, respond strictly with 'YES: ' followed by the reformulated query.\n"
-            "- If it does NOT, respond solely with 'NO'.\n"
-            "- Do not include explanations."
-        )
+        template = env.get_template("node_rag.jinga")
+        decision_prompt = template.render(rag_query=rag_query)
 
         try:
             decision_response = await self._llm.ainvoke([HumanMessage(content=decision_prompt)])
@@ -126,11 +127,11 @@ class AgentNodeExecutor:
         current_context = state.get("context", {})
         memory_data = state.get("memory_data", None)
 
-        system_prompt = "You are an autonomous AI assistant."
-        if rag_texts:
-            system_prompt += "\n\nRetrieved Knowledge (RAG):\n" + "\n".join(rag_texts)
-        if memory_data:
-            system_prompt += f"\n\nMemory Data:\n{memory_data}"
+        template = env.get_template("node_reasoning.jinga")
+        system_prompt = template.render(
+            rag_texts=rag_texts,
+            memory_data=memory_data
+        ).strip()
 
         react_agent = create_agent(model=self._llm, tools=tools, system_prompt=system_prompt)
         agent_response = await react_agent.ainvoke({"messages": messages})

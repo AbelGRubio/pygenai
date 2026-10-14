@@ -13,7 +13,7 @@ from langchain_mcp_adapters.sessions import (
 from langgraph.graph import END, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 
-from pygenai.agent.agent_node_executor import AgentNodeExecutor
+from pygenai.agent.node_executor import AgentNodeExecutor
 from pygenai.agent.models import AgentState, LLMConfig
 from pygenai.agent.settings import get_settings
 from pygenai.core.base_memory import MemoryTypes
