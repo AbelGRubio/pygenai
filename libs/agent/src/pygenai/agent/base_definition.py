@@ -11,6 +11,9 @@ class BaseAgentDefinition(ABC):
     Subclasses only override the methods corresponding to the features
     they need (RAG, Memory, MCP, LLM). Unimplemented hooks fallback to defaults.
     """
+    def __init__(self, builder: AgentBuilder | None = None) -> None:
+        """Initializes the BaseAgentDefinition with an AgentBuilder."""
+        self._builder = builder or AgentBuilder
 
     def configure_llm(self) -> Any | None:
         """Override to specify a custom LLM config, or use default."""
@@ -28,9 +31,13 @@ class BaseAgentDefinition(ABC):
         """Override to add MCP connections. Returns a dict of {name: connection}."""
         return {}
 
+    def set_builder(self, builder: AgentBuilder) -> None:
+        """Override to customize the AgentBuilder before building the graph."""
+        self._builder = builder
+
     def create_graph(self) -> CompiledStateGraph:
         """Assembles the agent using the AgentBuilder based on provided hooks."""
-        builder = AgentBuilder()
+        builder = self._builder()
 
         # 1. Optional LLM
         llm_config = self.configure_llm()

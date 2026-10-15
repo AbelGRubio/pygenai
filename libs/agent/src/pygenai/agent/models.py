@@ -27,5 +27,3 @@ class AgentState(TypedDict):
     tools: list[Any]
     memory_data: dict[str, Any]
     session_id: str | None
-
-

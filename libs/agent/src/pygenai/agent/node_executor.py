@@ -145,7 +145,32 @@ class AgentNodeExecutor:
         if self._memory:
             session_id = state.get("session_id", "")
             user_messages = state.get("messages", [])
+
             await self._memory.update_messages(session_id, user_messages)
+
+            if len(user_messages) > 6:
+                existing_summary = ""
+                try:
+                    existing_summary = await self._memory.get_summary(session_id)
+                except Exception:
+                    logger.warning(f"Memory summary not found for session {session_id}")
+                    existing_summary = None
+
+                template = env.get_template("node_memory.jinga")
+                summary_prompt = template.render(
+                    existing_summary=existing_summary,
+                    user_messages=user_messages
+                )
+
+                try:
+                    summary_response = await self._llm.ainvoke([HumanMessage(content=summary_prompt)])
+                    updated_summary = summary_response.content.strip()
+
+                    if updated_summary:
+                        await self._memory.add_summary(session_id, updated_summary)
+                except Exception:
+                    logger.warning("Failed to update memory summary.", exc_info=True)
+
         return {}
 
     async def close(self) -> None:
