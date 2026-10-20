@@ -1,7 +1,8 @@
-"""Agent Builder. """
+"""Agent Builder."""
+
 from __future__ import annotations
 
-from typing import Any, TypeAlias
+from typing import Any
 
 from langchain_litellm import ChatLiteLLM
 from langchain_mcp_adapters.sessions import (
@@ -13,15 +14,15 @@ from langchain_mcp_adapters.sessions import (
 from langgraph.graph import END, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 
-from pygenai.agent.node_executor import AgentNodeExecutor
 from pygenai.agent.models import AgentState, LLMConfig
+from pygenai.agent.node_executor import AgentNodeExecutor
 from pygenai.agent.settings import get_settings
 from pygenai.core.base_memory import MemoryTypes
 from pygenai.core.base_retriever import BaseRetriever
 from pygenai.core.logger import get_logger
 
 logger = get_logger(__name__)
-MCPConnection: TypeAlias = StdioConnection | SSEConnection | StreamableHttpConnection | WebsocketConnection
+type MCPConnection = StdioConnection | SSEConnection | StreamableHttpConnection | WebsocketConnection
 
 
 class AgentBuilder:
@@ -75,22 +76,20 @@ class AgentBuilder:
 
     def add_mcp(self, name: str, mcp: MCPConnection) -> AgentBuilder:
         """Add a Multi-Channel Protocol (MCP) connection to the agent.
-        The name is used to identify the MCP in the workflow."""
+
+        The name is used to identify the MCP in the workflow.
+        """
         self._mcps[name] = mcp
         return self
 
     def build(self) -> CompiledStateGraph:
         """Build and compile the LangGraph workflow.
-        
-        Subclasses can inherit this builder and override this method to change 
+
+        Subclasses can inherit this builder and override this method to change
         how nodes are wired or execute custom reasoning flows.
         """
         executor = AgentNodeExecutor(
-            llm=self._llm,
-            rag_sources=self._rag_sources,
-            memory=self._memory,
-            skills=self._skills,
-            mcps=self._mcps
+            llm=self._llm, rag_sources=self._rag_sources, memory=self._memory, skills=self._skills, mcps=self._mcps
         )
 
         workflow = StateGraph(self._state_schema)

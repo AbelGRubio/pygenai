@@ -1,3 +1,5 @@
+"""Models for the LangGraph agent."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -10,6 +12,7 @@ from typing_extensions import TypedDict
 @dataclass
 class LLMConfig:
     """Configuration class for LLM instances."""
+
     provider: str
     model_name: str
     api_base: str | None = None
@@ -20,6 +23,7 @@ class LLMConfig:
 
 class AgentState(TypedDict):
     """Defines the expanded state structure for the LangGraph agent."""
+
     messages: list[BaseMessage]
     context: dict[str, Any]
     rag_query: str | None

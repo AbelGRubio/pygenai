@@ -14,7 +14,7 @@ Copyright ©2026 All rights reserved.
 
 from __future__ import annotations
 
-from .adapters import InMemoryAdapter, PostgreSQLAdapter, RedisAdapter, PersistenceAdapter
+from .adapters import InMemoryAdapter, PersistenceAdapter, PostgreSQLAdapter, RedisAdapter
 from .buffer_memory import BufferMemory
 from .elasticsearch_memory import ElasticsearchMemory
 from .summarized_memory import SummarizedMemory
