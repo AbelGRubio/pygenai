@@ -22,11 +22,11 @@ jobs:
 
       - name: Install dependencies and build
         run: |
-          uv sync --group docs
-          uv run --python 3.13 mkdocs build -vv
+          uv sync --group docs --no-build
+          uv run --no-build --python 3.13 mkdocs build -vv
 
       - name: Fix README links for MkDocs
         run: make fix-links
 
       - name: Deploy to GitHub Pages
-        run: uv run mkdocs gh-deploy --force
+        run: uv run --no-build mkdocs gh-deploy --force

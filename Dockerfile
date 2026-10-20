@@ -27,7 +27,7 @@ WORKDIR /app
 
 RUN mkdir -p /app
 
-RUN uv sync --no-dev --no-editable
+RUN uv sync --no-dev --no-editable --no-build
 
 # ──────────────────────────────────────────────
 # Stage 2: Run — minimal runtime image

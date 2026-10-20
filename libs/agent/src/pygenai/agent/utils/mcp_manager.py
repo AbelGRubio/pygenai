@@ -53,7 +53,7 @@ class MCPManager:
     def _get_hash(self, mcp_config: dict[str, Any]) -> str:
         """Generate a stable hash for the given MCP configuration mapping."""
         config_str = json.dumps(mcp_config, sort_keys=True)
-        return hashlib.md5(config_str.encode()).hexdigest()  # noqa: S324
+        return hashlib.sha512(config_str.encode()).hexdigest()  # noqa: S324
 
     async def get_session(self, client: MultiServerMCPClient, name: str) -> ClientSession:
         """Return an active `ClientSession` for `name`, creating it if missing."""
