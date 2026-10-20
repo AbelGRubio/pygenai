@@ -55,7 +55,7 @@ class IDPAdapter(ABC):
         Returns:
              dict[str, Any]: Decoded token.
         """
-        return jwt.decode(token, options={"verify_signature": False})
+        return jwt.decode(token, options={"verify_signature": True})
 
     def get_payload_verified(self, token: str) -> dict[str, Any]:
         """Decodes and validates the token using the IDP's public keys.

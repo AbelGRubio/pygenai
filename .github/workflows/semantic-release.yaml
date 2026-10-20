@@ -33,10 +33,10 @@ jobs:
           python-version: "3.13"
 
       - name: Sync dependencies
-        run: uv sync
+        run: uv sync --no-build
 
       - name: Clean build artifacts
         run: rm -rf dist/
 
       - name: Semantic release
-        run: uv run semantic-release version
+        run: uv run --no-build semantic-release version
