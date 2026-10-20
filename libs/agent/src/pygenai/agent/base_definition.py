@@ -1,16 +1,20 @@
 """Base class for defining modular agents declaratively."""
-from abc import ABC
+
+import abc
 from typing import Any
-from pygenai.agent.builder import AgentBuilder
+
 from langgraph.graph.state import CompiledStateGraph
 
+from pygenai.agent.builder import AgentBuilder
 
-class BaseAgentDefinition(ABC):
+
+class BaseAgentDefinition(abc.ABC):  # noqa: B024
     """Base class for defining modular agents declaratively.
 
     Subclasses only override the methods corresponding to the features
     they need (RAG, Memory, MCP, LLM). Unimplemented hooks fallback to defaults.
     """
+
     def __init__(self, builder: AgentBuilder | None = None) -> None:
         """Initializes the BaseAgentDefinition with an AgentBuilder."""
         self._builder = builder or AgentBuilder

@@ -3,6 +3,7 @@
 from typing import Any, ClassVar
 
 import jwt
+
 from pygenai.core.middlewares.idp.idp_adapter import IDPAdapter
 
 

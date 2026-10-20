@@ -1,6 +1,8 @@
 """Tests for memory components."""
 
 import pytest
+from pygenai.core.base_memory import ConversationState, Message
+from pygenai.core.models import MessageRole
 
 from pygenai.memory import (
     BufferMemory,
@@ -8,8 +10,6 @@ from pygenai.memory import (
     SummarizedMemory,
     WindowMemory,
 )
-from pygenai.core.base_memory import Message, ConversationState
-from pygenai.core.models import MessageRole
 
 # Test constants
 EXPECTED_WINDOW_SIZE_BY_TOKENS = 3

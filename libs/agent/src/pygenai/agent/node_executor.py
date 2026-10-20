@@ -1,9 +1,16 @@
-"""Agent node executor. This module encapsulates the business logic and execution nodes for the agent, separating it from the builder to allow for clean modifications or extensions of reasoning behavior without cluttering the infrastructure setup."""
+"""Agent node executor.
+
+This module encapsulates the business logic and execution nodes for the agent,
+separating it from the builder to allow for clean modifications or extensions of reasoning behavior without cluttering
+the infrastructure setup.
+"""
+
 from __future__ import annotations
 
 import uuid
-from typing import Any, TypeAlias
+from typing import Any
 
+from jinja2 import Environment, PackageLoader, select_autoescape
 from langchain.agents import create_agent
 from langchain_core.messages import BaseMessage, HumanMessage
 from langchain_core.runnables import RunnableConfig
@@ -16,22 +23,17 @@ from langchain_mcp_adapters.sessions import (
     WebsocketConnection,
 )
 
+from pygenai.agent.models import AgentState
 from pygenai.agent.utils.mcp_manager import get_mcp_manager
 from pygenai.core.base_memory import MemoryTypes
 from pygenai.core.base_retriever import BaseRetriever
 from pygenai.core.logger import get_logger
-from pygenai.agent.models import AgentState
-
-from jinja2 import Environment, PackageLoader, select_autoescape
 
 # Configuración del entorno de Jinja para buscar en el paquete pygenai.agent.prompts
-env = Environment(
-    loader=PackageLoader("pygenai.agent", "prompts"),
-    autoescape=select_autoescape()
-)
+env = Environment(loader=PackageLoader("pygenai.agent", "prompts"), autoescape=select_autoescape())
 
 logger = get_logger(__name__)
-MCPConnection: TypeAlias = StdioConnection | SSEConnection | StreamableHttpConnection | WebsocketConnection
+type MCPConnection = StdioConnection | SSEConnection | StreamableHttpConnection | WebsocketConnection
 
 
 class AgentNodeExecutor:
@@ -41,8 +43,14 @@ class AgentNodeExecutor:
     behavior cleanly without cluttering the infrastructure setup.
     """
 
-    def __init__(self, llm: ChatLiteLLM, rag_sources: dict[str, BaseRetriever], memory: MemoryTypes | None,
-                 skills: list[Any], mcps: dict[str, MCPConnection]) -> None:
+    def __init__(
+        self,
+        llm: ChatLiteLLM,
+        rag_sources: dict[str, BaseRetriever],
+        memory: MemoryTypes | None,
+        skills: list[Any],
+        mcps: dict[str, MCPConnection],
+    ) -> None:
         """Initializes the AgentNodeExecutor with the provided LLM, RAG sources, memory, skills, and MCP connections."""
         self._llm = llm
         self._rag_sources = rag_sources
@@ -70,8 +78,9 @@ class AgentNodeExecutor:
             return {"session_id": session_id}
 
         last_msg = messages[-1]
-        rag_query = last_msg.content if isinstance(last_msg, HumanMessage) \
-            else getattr(last_msg, "content", str(last_msg))
+        rag_query = (
+            last_msg.content if isinstance(last_msg, HumanMessage) else getattr(last_msg, "content", str(last_msg))
+        )
         rag_texts = []
 
         template = env.get_template("node_rag.jinga")
@@ -128,10 +137,7 @@ class AgentNodeExecutor:
         memory_data = state.get("memory_data", None)
 
         template = env.get_template("node_reasoning.jinga")
-        system_prompt = template.render(
-            rag_texts=rag_texts,
-            memory_data=memory_data
-        ).strip()
+        system_prompt = template.render(rag_texts=rag_texts, memory_data=memory_data).strip()
 
         react_agent = create_agent(model=self._llm, tools=tools, system_prompt=system_prompt)
         agent_response = await react_agent.ainvoke({"messages": messages})
@@ -157,10 +163,7 @@ class AgentNodeExecutor:
                     existing_summary = None
 
                 template = env.get_template("node_memory.jinga")
-                summary_prompt = template.render(
-                    existing_summary=existing_summary,
-                    user_messages=user_messages
-                )
+                summary_prompt = template.render(existing_summary=existing_summary, user_messages=user_messages)
 
                 try:
                     summary_response = await self._llm.ainvoke([HumanMessage(content=summary_prompt)])

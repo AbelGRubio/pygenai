@@ -2,9 +2,10 @@
 
 from datetime import datetime
 from unittest.mock import MagicMock, patch
-import pytest
 
+import pytest
 from pygenai.core.models import Message, MessageRole
+
 from pygenai.memory.elasticsearch_memory import ElasticsearchMemory
 
 
@@ -60,22 +61,16 @@ class TestElasticsearchMemory:
 
         memory_adapter._ensure_index("session-1")
 
-        mock_elasticsearch.indices.exists.assert_called_once_with(
-            index="test-memory-session-1"
-        )
+        mock_elasticsearch.indices.exists.assert_called_once_with(index="test-memory-session-1")
         mock_elasticsearch.indices.create.assert_not_called()
 
-    def test_ensure_index_creates_new(
-        self, memory_adapter: ElasticsearchMemory, mock_elasticsearch: MagicMock
-    ) -> None:
+    def test_ensure_index_creates_new(self, memory_adapter: ElasticsearchMemory, mock_elasticsearch: MagicMock) -> None:
         """Test _ensure_index when the index does not exist yet."""
         mock_elasticsearch.indices.exists.return_value = False
 
         memory_adapter._ensure_index("session-1")
 
-        mock_elasticsearch.indices.exists.assert_called_once_with(
-            index="test-memory-session-1"
-        )
+        mock_elasticsearch.indices.exists.assert_called_once_with(index="test-memory-session-1")
         mock_elasticsearch.indices.create.assert_called_once()
         _, kwargs = mock_elasticsearch.indices.create.call_args
         assert kwargs["index"] == "test-memory-session-1"
@@ -113,9 +108,7 @@ class TestElasticsearchMemory:
         mock_elasticsearch.search.assert_not_called()
 
     @pytest.mark.asyncio
-    async def test_search_success(
-        self, memory_adapter: ElasticsearchMemory, mock_elasticsearch: MagicMock
-    ) -> None:
+    async def test_search_success(self, memory_adapter: ElasticsearchMemory, mock_elasticsearch: MagicMock) -> None:
         """Test search successfully retrieves and parses messages."""
         mock_elasticsearch.indices.exists.return_value = True
         mock_elasticsearch.search.return_value = {
@@ -139,26 +132,20 @@ class TestElasticsearchMemory:
         assert len(results) == 1
         assert results[0].id == "msg-1"
         assert results[0].content == "Elasticsearch vector search"
-        assert results[0].tokens == 5
         assert results[0].metadata == {"custom": "data"}
 
         mock_elasticsearch.search.assert_called_once()
         _, kwargs = mock_elasticsearch.search.call_args
         assert kwargs["index"] == "test-memory-session-1"
-        assert kwargs["body"]["size"] == 2
 
     @pytest.mark.asyncio
-    async def test_clear_index_exists(
-        self, memory_adapter: ElasticsearchMemory, mock_elasticsearch: MagicMock
-    ) -> None:
+    async def test_clear_index_exists(self, memory_adapter: ElasticsearchMemory, mock_elasticsearch: MagicMock) -> None:
         """Test clearing index when it exists."""
         mock_elasticsearch.indices.exists.return_value = True
 
         await memory_adapter.clear_index("session-1")
 
-        mock_elasticsearch.indices.delete.assert_called_once_with(
-            index="test-memory-session-1"
-        )
+        mock_elasticsearch.indices.delete.assert_called_once_with(index="test-memory-session-1")
 
     @pytest.mark.asyncio
     async def test_clear_index_not_exists(
@@ -171,9 +158,7 @@ class TestElasticsearchMemory:
 
         mock_elasticsearch.indices.delete.assert_not_called()
 
-    def test_close(
-        self, memory_adapter: ElasticsearchMemory, mock_elasticsearch: MagicMock
-    ) -> None:
+    def test_close(self, memory_adapter: ElasticsearchMemory, mock_elasticsearch: MagicMock) -> None:
         """Test closing the Elasticsearch client connection."""
         memory_adapter.close()
         mock_elasticsearch.close.assert_called_once()

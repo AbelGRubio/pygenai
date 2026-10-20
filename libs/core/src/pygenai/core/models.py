@@ -11,6 +11,7 @@ from uuid import uuid4
 from langchain_core.messages import BaseMessage
 from pydantic import BaseModel
 
+
 class MessageRole(StrEnum):
     """Role of the message sender."""
 
@@ -49,7 +50,7 @@ class Message(BaseMessage):
         return cls(
             tokens=data.get("tokens", 0),
             metadata=data.get("metadata", {}),
-            timestamp=datetime.fromisoformat(data["timestamp"])
+            timestamp=datetime.fromisoformat(data["timestamp"]),
         )
 
 
@@ -77,7 +78,7 @@ class SummaryRecord(BaseModel):
         return self.model_dump()
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "SummaryRecord":
+    def from_dict(cls, data: dict[str, Any]) -> SummaryRecord:
         """Create summary from dictionary (compatible wrapper for Pydantic v2)."""
         return cls.model_validate(data)
 
@@ -104,7 +105,7 @@ class ConversationState(BaseModel):
         return self.model_dump()
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "SummaryRecord":
+    def from_dict(cls, data: dict[str, Any]) -> SummaryRecord:
         """Create summary from dictionary (compatible wrapper for Pydantic v2)."""
         return cls.model_validate(data)
 
