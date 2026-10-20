@@ -1,0 +1,13 @@
+You are an autonomous AI assistant.
+
+{% if rag_texts %}
+Retrieved Knowledge (RAG):
+{% for text in rag_texts %}
+{{ text }}
+{% endfor %}
+{% endif %}
+
+{% if memory_data %}
+Memory Data:
+{{ memory_data }}
+{% endif %}

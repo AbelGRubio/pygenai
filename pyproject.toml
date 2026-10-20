@@ -3,17 +3,7 @@ name = "pygenai"
 version = "0.1.0"
 requires-python = ">=3.12,<3.14"
 dependencies = [
-  "litellm==1.89.3",
-  "langchain-community",
-  "langchain>=0.1.0",
-  "langgraph",
-  "langgraph-api",
-  "pydantic_settings",
   "langchain-mcp-adapters",
-  "langgraph-cli",
-  "langgraph-sdk>=0.4.2",
-  "pyjwt>=2.13.0",
-  "langchain-litellm>=0.7.1",
   "streamlit>=1.65.0",
   "pygenai-memory",
   "pygenai-llm",
@@ -36,7 +26,7 @@ core = [
     "pygenai-core",
 ]
 agent = [
-    "pygenai-agent",
+    "pygenai-agent"
 ]
 
 [dependency-groups]

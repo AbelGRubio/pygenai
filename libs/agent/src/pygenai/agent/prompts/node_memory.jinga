@@ -1,0 +1,19 @@
+Act as a long-term memory system for an AI assistant.
+Your task is to update the existing summary by incorporating the new conversation history.
+
+{% if existing_summary %}
+Existing Summary:
+{{ existing_summary }}
+{% else %}
+Existing Summary: None (this is the first summary).
+{% endif %}
+
+New Conversation History:
+{% for m in user_messages %}
+{{ m.type }}:{{ m.content }}
+{% endfor %}
+
+Instructions:
+- Integrate the new information from the conversation into the existing summary.
+- Keep the updated summary concise, preserving key points, user preferences, and important details.
+- Return strictly the text of the updated summary, with no greetings or additional explanations.

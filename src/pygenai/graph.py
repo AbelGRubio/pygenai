@@ -1,44 +1,46 @@
 """Main entry point for the CopilotKit agent graph."""
 
 from pathlib import Path
+from typing import Any
 
 from langchain_mcp_adapters.sessions import StreamableHttpConnection
 
-from pygenai.agent.agent_builder import AgentBuilder
-from pygenai.agent.settings import get_settings
-from pygenai.core.logger import get_logger
+from pygenai.agent.base_definition import BaseAgentDefinition
 from pygenai.memory.buffer_memory import BufferMemory
 from pygenai.rag.chunking import FixedSizeChunker
 from pygenai.rag.loaders import TextLoader
 from pygenai.rag.retrievers import HybridRetriever
 from pygenai.rag.vectorstores import InMemoryVectorStore
 
-logger = get_logger(__name__)
-settings = get_settings()
 
-agent_builder = AgentBuilder()
-memory = BufferMemory()
-source = Path("./example_documents/rag_demo.txt")
+class DemoCopilotAgent(BaseAgentDefinition):
+    """Custom agent definition using RAG and Memory (MCP is omitted)."""
 
-loaded_documents = TextLoader().load(source)
-chunker = FixedSizeChunker(chunk_size=220, overlap=40)
+    def configure_memory(self) -> BufferMemory:
+        """Configure a simple in-memory buffer for the agent."""
+        return BufferMemory()
 
-chunks = []
-for document in loaded_documents:
-    chunks.extend(chunker.chunk_document(document))
+    def configure_rag(self) -> dict[str, Any]:
+        """Configure a RAG source for the agent using a text file."""
+        source = Path("./example_documents/rag_demo.txt")
+        loaded_documents = TextLoader().load(source)
+        chunker = FixedSizeChunker(chunk_size=220, overlap=40)
 
-store = InMemoryVectorStore()
-store.add_documents(chunks)
+        chunks = []
+        for document in loaded_documents:
+            chunks.extend(chunker.chunk_document(document))
 
-retriever = HybridRetriever(store)
+        store = InMemoryVectorStore()
+        store.add_documents(chunks)
+        retriever = HybridRetriever(store)
 
-agent_builder.add_rag_source("demo_source", retriever=retriever)
-agent_builder.add_memory(memory)
+        return {"demo_source": retriever}
 
-agent_builder.add_mcp(
-    name="demo_mcp", mcp=StreamableHttpConnection(url="http://localhost:8000/mcp", transport="streamable_http")
-)
+    def configure_mcps(self) -> dict[str, Any]:
+        """MCP connections are configured for this demo agent."""
+        return {"demo_mcp": StreamableHttpConnection(url="http://localhost:8000/mcp", transport="streamable_http")}
 
 
-# Compile the workflow graph
-graph = agent_builder.build()
+# Starting point to create the agent graph based on the DemoCopilotAgent definition.
+agent_definition = DemoCopilotAgent()
+graph = agent_definition.create_graph()
