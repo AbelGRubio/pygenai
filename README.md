@@ -1,4 +1,4 @@
-# pygenai
+# PyGenAI
 
 > A modular, monorepo-based Python framework and scaffold for building, orchestrating, and deploying scalable AI agents and workflows.
 
