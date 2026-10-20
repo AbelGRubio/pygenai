@@ -1,14 +1,17 @@
+"""Custom workflow agent definition using RAG and Memory (MCP is omitted)."""
+
 from pathlib import Path
 from typing import Any
 
+from agent.node_executor import AgentNodeExecutor
+from langgraph.graph import END, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 
-from agent.node_executor import AgentNodeExecutor
 from pygenai.agent.base_definition import BaseAgentDefinition
-from pygenai.memory import BufferMemory
-from pygenai.rag import TextLoader, FixedSizeChunker, InMemoryVectorStore, HybridRetriever
 from pygenai.agent.builder import AgentBuilder
-from langgraph.graph import END, StateGraph
+from pygenai.memory import BufferMemory
+from pygenai.rag import FixedSizeChunker, HybridRetriever, InMemoryVectorStore, TextLoader
+
 
 class CustomBuilder(AgentBuilder):
     """Custom AgentBuilder that can be extended for additional configurations."""
@@ -20,11 +23,7 @@ class CustomBuilder(AgentBuilder):
     def build(self) -> CompiledStateGraph:
         """Builds the agent graph based on the current configuration."""
         executor = AgentNodeExecutor(
-            llm=self._llm,
-            rag_sources=self._rag_sources,
-            memory=self._memory,
-            skills=self._skills,
-            mcps=self._mcps
+            llm=self._llm, rag_sources=self._rag_sources, memory=self._memory, skills=self._skills, mcps=self._mcps
         )
 
         workflow = StateGraph(self._state_schema)
@@ -43,7 +42,6 @@ class CustomBuilder(AgentBuilder):
         workflow.add_edge("save_memory", END)
 
         return workflow.compile()
-
 
 
 class CustomWorkflowAgent(BaseAgentDefinition):
