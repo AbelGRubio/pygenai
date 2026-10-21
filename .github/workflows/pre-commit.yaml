@@ -23,7 +23,7 @@ jobs:
         run: uv python install 3.13
 
       - name: Sync dependencies
-        run: uv sync --no-build
+        run: uv sync
 
       - name: Run pre-commit
-        run: uv run --no-build pre-commit run --all-files
+        run: uv run pre-commit run --all-files
