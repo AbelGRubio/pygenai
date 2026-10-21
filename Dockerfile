@@ -19,6 +19,8 @@ ENV UV_NO_DEV=1 \
 COPY --from=observe-core . /observe_core
 COPY src/ /app/src/
 COPY pyproject.toml /app/
+COPY uv.lock /app/
+COPY libs /app/libs/
 
 # ──────────────────────────────────────────────
 # Authenticate and sync UV dependencies
