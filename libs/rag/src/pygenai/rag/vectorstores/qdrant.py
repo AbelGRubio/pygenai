@@ -2,7 +2,7 @@
 
 ========================================================================================================================
 Name:         pygenai/rag/vectorstores/qdrant.py
-Description:  Provides a minimal wrapper for Qdrant collections.
+Description:  Provides a robust wrapper for Qdrant collections with connection and similarity search.
 Project:      Pygenai
 Date:         2026-10-02 12:29:54
 Status:       Development
@@ -21,35 +21,120 @@ from pygenai.rag.vectorstores.base import VectorStore
 
 try:
     from qdrant_client import QdrantClient  # type: ignore[import-not-found]
+    from qdrant_client.http import models  # type: ignore[import-not-found]
 except ImportError:  # pragma: no cover - optional dependency path
     QdrantClient = None
+    models = None
 
 
 class QdrantVectorStore(VectorStore):
     """Adapter for a Qdrant collection."""
 
-    def __init__(self, collection_name: str, *, client: Any | None = None) -> None:
-        """Initialize the Qdrant wrapper."""
+    def __init__(
+        self,
+        collection_name: str,
+        *,
+        url: str | None = None,
+        api_key: str | None = None,
+        client: Any | None = None,
+        prefer_grpc: bool = False,
+    ) -> None:
+        """Initialize the Qdrant connection and wrapper."""
         if QdrantClient is None and client is None:
             msg = "Qdrant support requires the optional dependency 'qdrant-client'."
             raise ImportError(msg)
-        self._client = client
+
+        if client is not None:
+            self._client = client
+        else:
+            self._client = QdrantClient(url=url, api_key=api_key, prefer_grpc=prefer_grpc)
+
         self.collection_name = collection_name
 
     def add_documents(
         self, documents: Sequence[Document | Chunk], *, embeddings: Sequence[Sequence[float]] | None = None
     ) -> list[str]:
-        """Add documents to a Qdrant collection."""
-        del embeddings
-        return [getattr(document, "id", f"qdrant-{index}") for index, document in enumerate(documents)]
+        """Add documents and embeddings to a Qdrant collection."""
+        if embeddings is None:
+            msg = "Qdrant requires explicit embeddings to upsert points."
+            raise ValueError(msg)
+        if len(documents) != len(embeddings):
+            msg = "documents and embeddings must have the same length."
+            raise ValueError(msg)
+
+        points = []
+        ids = []
+        for i, document in enumerate(documents):
+            # Qdrant point IDs can be integers or UUID strings; using index or string id hash
+            point_id = i + 1
+            str_id = str(getattr(document, "id", f"qdrant-{i}"))
+            ids.append(str_id)
+
+            payload = dict(document.metadata) if document.metadata else {}
+            payload["text"] = document.text
+            payload["original_id"] = str_id
+
+            points.append(
+                models.PointStruct(
+                    id=point_id,
+                    vector=list(embeddings[i]),
+                    payload=payload,
+                )
+            )
+
+        self._client.upsert(
+            collection_name=self.collection_name,
+            points=points,
+        )
+        return ids
 
     def similarity_search(
         self, query: str, k: int = 5, *, filter_search: dict[str, Any] | None = None
     ) -> list[SearchHit]:
-        """Return candidates ordered by Qdrant similarity."""
-        del query, k, filter_search
-        return []
+        """Return candidates ordered by Qdrant similarity search using a query vector."""
+        del query
+        if filter_search is None or "query_vector" not in filter_search:
+            msg = "Qdrant similarity_search requires a query vector via filter_search={'query_vector': [...]}"
+            raise ValueError(msg)
+
+        query_vector = filter_search["query_vector"]
+        qdrant_filter = filter_search.get("filter")
+
+        hits = self._client.search(
+            collection_name=self.collection_name,
+            query_vector=list(query_vector),
+            limit=k,
+            query_filter=qdrant_filter,
+        )
+
+        results: list[SearchHit] = []
+        for hit in hits:
+            payload = hit.payload or {}
+            text = payload.pop("text", "")
+            original_id = payload.pop("original_id", str(hit.id))
+            score = float(hit.score)
+
+            document = Document(id=original_id, text=text, metadata=payload)
+            results.append(SearchHit(document=document, score=score, metadata=payload))
+
+        return results
 
     def delete(self, ids: Sequence[str]) -> None:
-        """Delete entries from the target collection."""
-        del ids
+        """Delete entries from the target collection using payload identifiers or point IDs."""
+        # Deletion by filter based on stored original_id
+        self._client.delete(
+            collection_name=self.collection_name,
+            points_selector=models.FilterSelector(
+                filter=models.Filter(
+                    must=[
+                        models.FieldCondition(
+                            key="original_id",
+                            match=models.MatchAny(any=list(ids)),
+                        )
+                    ]
+                )
+            ),
+        )
+
+
+__all__ = ["QdrantVectorStore"]
