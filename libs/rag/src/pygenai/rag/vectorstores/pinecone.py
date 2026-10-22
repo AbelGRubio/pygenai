@@ -1,10 +1,10 @@
-"""Pinecone vector store adapter.
+"""Pinecone vector store adapter for distributed RAG and agent memory.
 
 ========================================================================================================================
-Name:         pygenai/rag/vectorstores/pinecone.py
-Description:  Provides a robust wrapper for Pinecone-backed vector storage with connection and similarity search.
+Name:         pygenai/vectorstores/pinecone.py
+Description:  Provides a robust wrapper for Pinecone-backed vector storage with metadata filtering for memory and files.
 Project:      Pygenai
-Date:         2026-10-02 12:29:54
+Date:         2026-10-22 17:30:00
 Status:       Development
 
 Copyright ©2026 All rights reserved.
@@ -17,16 +17,16 @@ from collections.abc import Sequence
 from typing import Any
 
 from pygenai.core.data import Chunk, Document, SearchHit
-from pygenai.rag.vectorstores.base import VectorStore
+from pygenai.vectorstores.base import VectorStore
 
 try:
     from pinecone import Pinecone  # type: ignore[import-not-found]
-except ImportError:  # pragma: no cover - optional dependency path
+except ImportError:  # pragma: no cover
     Pinecone = None
 
 
 class PineconeVectorStore(VectorStore):
-    """Adapter for Pinecone vector storage."""
+    """Adapter for Pinecone vector storage supporting namespaces and metadata filtering."""
 
     def __init__(
         self,
@@ -80,21 +80,26 @@ class PineconeVectorStore(VectorStore):
     def similarity_search(
         self, query: str, k: int = 5, *, filter_search: dict[str, Any] | None = None
     ) -> list[SearchHit]:
-        """Query a Pinecone index for close vectors using a query vector."""
+        """Query a Pinecone index for close vectors using a query vector and metadata filters."""
         del query
         if filter_search is None or "query_vector" not in filter_search:
             msg = "Pinecone similarity_search requires a query vector via filter_search={'query_vector': [...]}"
             raise ValueError(msg)
 
         query_vector = filter_search["query_vector"]
-        pinecone_filter = filter_search.get("filter")
+
+        # Build Pinecone metadata filter map, isolating top-level filters or embedded ones
+        pinecone_filter = filter_search.get("filter", {})
+        for key in ["memory_type", "user_id", "session_id"]:
+            if key in filter_search and key not in pinecone_filter:
+                pinecone_filter[key] = filter_search[key]
 
         response = self._index.query(
             vector=list(query_vector),
             top_k=k,
             include_metadata=True,
             namespace=self.namespace,
-            filter=pinecone_filter,
+            filter=pinecone_filter if pinecone_filter else None,
         )
 
         results: list[SearchHit] = []
@@ -111,7 +116,7 @@ class PineconeVectorStore(VectorStore):
         return results
 
     def delete(self, ids: Sequence[str]) -> None:
-        """Delete vectors from a Pinecone index."""
+        """Delete vectors from a Pinecone index within the configured namespace."""
         self._index.delete(ids=list(ids), namespace=self.namespace)
 
 
