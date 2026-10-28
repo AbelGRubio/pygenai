@@ -63,6 +63,8 @@ class InMemoryVectorStore(VectorStore):
             )
         self._embedding_model = embeddings or SimpleEmbeddings()
         self._store = LangChainInMemoryVectorStore(embedding=self._embedding_model)
+        self._filter_search = {}
+        self._memory_keys = ["memory_type", "user_id", "session_id"]
 
     def add_documents(
         self,
@@ -76,21 +78,24 @@ class InMemoryVectorStore(VectorStore):
         document_ids = [str(getattr(document, "id", "")) for document in documents]
         return self._store.add_documents(langchain_documents, ids=document_ids)
 
+    def _langchain_filter(self, doc: Document) -> Any:
+        """Create a LangChain-compatible filter function for memory attributes."""
+        return all(
+            doc.metadata.get(k_sub) == v_sub
+            for k_sub, v_sub in self._filter_search.items()
+            if k_sub in self._memory_keys and v_sub is not None
+        )
+
     def similarity_search(
         self, query: str, k: int = 5, *, filter_search: dict[str, Any] | None = None
     ) -> list[SearchHit]:
         """Return the best matches with their scores using LangChain vector search and metadata filters."""
         # Normalize filter parameters for memory/RAG attributes if passed via flat dictionary
         langchain_filter = filter_search
-        if filter_search and "filter" not in filter_search:
+        if filter_search and "filter" not in filter_search and any(key in filter_search for key in self._memory_keys):
             # Check if we have top-level memory keys like memory_type, user_id, session_id
-            memory_keys = ["memory_type", "user_id", "session_id"]
-            if any(key in filter_search for key in memory_keys):
-                langchain_filter = lambda doc: all(
-                    doc.metadata.get(k_sub) == v_sub
-                    for k_sub, v_sub in filter_search.items()
-                    if k_sub in memory_keys and v_sub is not None
-                )
+            self._filter_search = filter_search
+            langchain_filter = self._langchain_filter
 
         matches = self._store.similarity_search_with_score(query, k=k, filter=langchain_filter)
         results: list[SearchHit] = []

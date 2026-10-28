@@ -90,7 +90,7 @@ class FAISSVectorStore(VectorStore):
         distances, indices = self._index.search(q_vector, min(fetch_k, len(self._documents)))
 
         results: list[SearchHit] = []
-        for score, idx in zip(distances[0], indices[0]):
+        for score, idx in zip(distances[0], indices[0], strict=True):
             if idx < 0 or idx >= len(self._documents):
                 continue
             document = self._documents[idx]
@@ -123,8 +123,6 @@ class FAISSVectorStore(VectorStore):
         id_set = set(ids)
         new_docs: list[Document | Chunk] = []
         new_ids: list[str] = []
-
-        kept_embeddings = []
 
         for i, doc_id in enumerate(self._ids):
             if doc_id not in id_set:

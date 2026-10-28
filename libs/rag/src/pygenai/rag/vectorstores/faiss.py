@@ -74,7 +74,7 @@ class FAISSVectorStore(VectorStore):
         Note: FAISS operates purely on numerical vectors. This method requires a precomputed
         query embedding vector passed via filter_search or expects an external embedding step.
         """
-        del filter_search
+        # del filter_search
         query_embedding = filter_search.get("query_embedding") if filter_search else None
         if query_embedding is None:
             msg = (
@@ -88,7 +88,7 @@ class FAISSVectorStore(VectorStore):
         distances, indices = self._index.search(q_vector, min(k, len(self._documents)))
 
         results: list[SearchHit] = []
-        for score, idx in zip(distances[0], indices[0]):
+        for score, idx in zip(distances[0], indices[0], strict=True):
             if idx < 0 or idx >= len(self._documents):
                 continue
             document = self._documents[idx]

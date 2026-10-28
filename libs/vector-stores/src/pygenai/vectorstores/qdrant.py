@@ -40,6 +40,7 @@ class QdrantVectorStore(VectorStore):
         client: Any | None = None,
         prefer_grpc: bool = False,
     ) -> None:
+        """Initialize the Qdrant vector store with a collection name and optional client configuration."""
         if QdrantClient is None and client is None:
             msg = "Qdrant support requires the optional dependency 'qdrant-client'."
             raise ImportError(msg)
@@ -54,6 +55,7 @@ class QdrantVectorStore(VectorStore):
     def add_documents(
         self, documents: Sequence[Document | Chunk], *, embeddings: Sequence[Sequence[float]] | None = None
     ) -> list[str]:
+        """Add a collection of documents to the Qdrant collection with optional precomputed embeddings."""
         if embeddings is None:
             msg = "Qdrant requires explicit embeddings to upsert points."
             raise ValueError(msg)
@@ -86,6 +88,7 @@ class QdrantVectorStore(VectorStore):
     def similarity_search(
         self, query: str, k: int = 5, *, filter_search: dict[str, Any] | None = None
     ) -> list[SearchHit]:
+        """Perform a similarity search in the Qdrant collection using a query vector and optional filtering."""
         del query
         if filter_search is None or "query_vector" not in filter_search:
             msg = "Qdrant similarity_search requires a query vector via filter_search={'query_vector': [...]}"
@@ -114,6 +117,7 @@ class QdrantVectorStore(VectorStore):
         return results
 
     def delete(self, ids: Sequence[str]) -> None:
+        """Delete documents from the Qdrant collection by their original IDs."""
         self._client.delete(
             collection_name=self.collection_name,
             points_selector=models.FilterSelector(
