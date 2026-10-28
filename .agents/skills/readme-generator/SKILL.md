@@ -20,7 +20,7 @@ When asked to create or update a `README.md`, you must strictly follow this modu
    - Clear bullet points highlighting the technical capabilities of the project (e.g., modular support, integration with LiteLLM, LangGraph, etc.).
 
 3. **Architecture and Project Structure (`## Architecture`)**
-   - Display the directory structure in a tree format (`tree`) so developers can quickly understand where each component is located (`loaders`, `chunking`, `vectorstores`, `memory`, etc.).
+   - Display the directory structure in a tree format (`tree`) so developers can quickly understand where each component is located (`loaders`, `chunking`, `vectorstore`, `memory`, etc.).
 
 4. **Prerequisites and Environment (`## Prerequisites`)**
    - Required Python versions or other tools (e.g., Python 3.13, package managers like `uv` or `pip`).

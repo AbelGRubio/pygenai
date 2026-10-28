@@ -1,0 +1,67 @@
+name: Master Pipeline (Proyecto Principal)
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  pre-commit:
+    if: "!contains(github.event.head_commit.message, 'chore(release)')"
+    uses: AbelGRubio/github-actions-templates/.github/workflows/pre-commit.yml@v0.0.1
+
+  test:
+    needs: pre-commit
+    uses: AbelGRubio/github-actions-templates/.github/workflows/test.yml@v0.0.1
+    secrets:
+      PR_TOKEN_USER: ${{ secrets.PR_TOKEN_USER }}
+
+#  sonar:
+#    needs: test
+#    uses: AbelGRubio/github-actions-templates/.github/workflows/sonarqube.yml@v0.0.1
+#    secrets:
+#      PR_TOKEN_USER: ${{ secrets.PR_TOKEN_USER }}
+
+  approve-release:
+    needs: test
+    if: |
+      (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')) ||
+      (github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    environment: release
+    steps:
+      - run: echo "Release approved by user"
+
+  release:
+    needs: approve-release
+    permissions:
+      contents: write
+      packages: write
+    uses: AbelGRubio/github-actions-templates/.github/workflows/semantic-release.yml@v0.0.1
+    secrets:
+      PR_TOKEN_USER: ${{ secrets.PR_TOKEN_USER }}
+
+#  docs:
+#    needs: [ test, release ]
+#    if: |
+#      always() &&
+#      (needs.release.result == 'success') && needs.test.result == 'success' &&
+#      github.ref == 'refs/heads/main'
+#    permissions:
+#      contents: write
+#    uses: AbelGRubio/github-actions-templates/.github/workflows/docs.yml@v0.0.1
+#
+#
+#  docker:
+#    needs: [test, release]
+#    if: |
+#      always() && github.event_name == 'push' &&
+#      vars.ENABLE_PYPI_PUBLISH == 'true' &&
+#      (github.ref == 'refs/heads/main' || needs.release.result == 'success')
+#    permissions:
+#      packages: write
+#      contents: read
+#    uses: AbelGRubio/github-actions-templates/.github/workflows/docker-build-publish.yml@v0.0.1
+#    secrets: inherit
