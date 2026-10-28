@@ -2,7 +2,7 @@
 
 ========================================================================================================================
 Name:         pygenai/rag/vectorstores/faiss.py
-Description:  Wraps the FAISS vector database for local development and rapid vector retrieval.
+Description:  Wraps the FAISS vector database for local development and rapid vector retrieval with similarity search.
 Project:      Pygenai
 Date:         2026-10-02 12:19:24
 Status:       Development
@@ -38,6 +38,7 @@ class FAISSVectorStore(VectorStore):
         self.metric = metric
         self._ids: list[str] = []
         self._documents: list[Document | Chunk] = []
+
         if metric == "l2":
             self._index = faiss.IndexFlatL2(dimension)
         else:
@@ -54,23 +55,54 @@ class FAISSVectorStore(VectorStore):
             msg = "documents and embeddings must have the same length."
             raise ValueError(msg)
 
-        float_matrix = [list(values) for values in embeddings]
+        import numpy as np
+
+        float_matrix = np.array([list(values) for values in embeddings], dtype=np.float32)
         self._index.add(float_matrix)
+
         for document in documents:
             self._documents.append(document)
-            self._ids.append(getattr(document, "id", f"vector-{len(self._ids)}"))
+            self._ids.append(str(getattr(document, "id", f"vector-{len(self._ids)}")))
+
         return self._ids[-len(documents) :]
 
     def similarity_search(
         self, query: str, k: int = 5, *, filter_search: dict[str, Any] | None = None
     ) -> list[SearchHit]:
-        """Find documents by querying the FAISS index using an embedding vector."""
-        raise NotImplementedError("FAISS search requires the application layer to supply an embedding model.")
+        """Find documents by querying the FAISS index.
+
+        Note: FAISS operates purely on numerical vectors. This method requires a precomputed
+        query embedding vector passed via filter_search or expects an external embedding step.
+        """
+        del filter_search
+        query_embedding = filter_search.get("query_embedding") if filter_search else None
+        if query_embedding is None:
+            msg = "FAISS similarity_search requires a query embedding vector via filter_search={'query_embedding': [...]}"
+            raise ValueError(msg)
+
+        import numpy as np
+
+        q_vector = np.array([query_embedding], dtype=np.float32)
+        distances, indices = self._index.search(q_vector, min(k, len(self._documents)))
+
+        results: list[SearchHit] = []
+        for score, idx in zip(distances[0], indices[0]):
+            if idx < 0 or idx >= len(self._documents):
+                continue
+            document = self._documents[idx]
+            results.append(
+                SearchHit(
+                    document=document,
+                    score=float(score),
+                    metadata=dict(document.metadata) if document.metadata else {},
+                )
+            )
+        return results
 
     def delete(self, ids: Sequence[str]) -> None:
-        """Delete options are not implemented directly for FAISS; use a custom metadata index if needed."""
+        """FAISS standard flat indexes do not support granular item deletion directly."""
         del ids
-        msg = "FAISS deletion is not implemented directly in this convenience wrapper."
+        msg = "FAISS deletion is not supported natively in flat index wrappers."
         raise NotImplementedError(msg)
 
 
