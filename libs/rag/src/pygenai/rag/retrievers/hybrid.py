@@ -18,7 +18,7 @@ from itertools import groupby
 
 from pygenai.core.base_retriever import BaseRetriever, RetrievedDocument
 from pygenai.core.data import Chunk, Document
-from pygenai.rag.vectorstores.base import VectorStore
+from pygenai.vectorstore.base import VectorStore
 
 
 class HybridRetriever(BaseRetriever):

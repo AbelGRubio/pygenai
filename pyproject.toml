@@ -28,6 +28,9 @@ core = [
 agent = [
     "pygenai-agent"
 ]
+vectorstore = [
+    "pygenai-vectorstore"
+]
 
 [dependency-groups]
 dev = [
@@ -53,6 +56,7 @@ pygenai-llm = { workspace = true }
 pygenai-memory = { workspace = true }
 pygenai-rag = { workspace = true }
 pygenai-agent = { workspace = true }
+pygenai-vectorstore = { workspace = true }
 
 [tool.uv.workspace]
 members = [
@@ -61,6 +65,7 @@ members = [
     "libs/memory",
     "libs/rag",
     "libs/agent",
+    "libs/vectorstore"
 ]
 
 [tool.pytest.ini_options]
@@ -73,7 +78,8 @@ pythonpath = [
     "libs/core/src",
     "libs/llm/src",
     "libs/rag/src",
-    "libs/agent/src"
+    "libs/agent/src",
+    "libs/vectorstore/src"
 ]
 addopts = [
     "-n",

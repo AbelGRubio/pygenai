@@ -2,7 +2,8 @@
 
 from pathlib import Path
 
-from pygenai.rag import FixedSizeChunker, HybridRetriever, InMemoryVectorStore, TextLoader
+from pygenai.rag import FixedSizeChunker, HybridRetriever, TextLoader
+from pygenai.vectorstore import InMemoryVectorStore
 from pygenai.core.data import Document
 
 

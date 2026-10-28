@@ -37,42 +37,28 @@ from .retrievers import (
     NoOpReranker,
     VectorRetriever,
 )
-from .vectorstores import (
-    ChromaVectorStore,
-    FAISSVectorStore,
-    InMemoryVectorStore,
-    PineconeVectorStore,
-    QdrantVectorStore,
-    VectorStore,
-)
 
 __version__ = "0.1.0"
 
 __all__ = [
     "BaseEmbeddings",
     "CSVLoader",
-    "ChromaVectorStore",
     "ChunkStrategy",
     "CrossEncoderReranker",
     "DocumentLoader",
-    "FAISSVectorStore",
     "FileDocumentLoader",
     "FixedSizeChunker",
     "HybridRetriever",
-    "InMemoryVectorStore",
     "LiteLLMEmbeddings",
     "MarkdownLoader",
     "MultiFormatLoader",
     "NoOpReranker",
     "PDFLoader",
-    "PineconeVectorStore",
-    "QdrantVectorStore",
     "SemanticChunker",
     "SimpleEmbeddings",
     "StructureChunker",
     "TextLoader",
     "TokenChunker",
     "VectorRetriever",
-    "VectorStore",
     "WebLoader",
 ]

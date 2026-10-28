@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pygenai.core.data import Document
-from pygenai.rag.vectorstores import InMemoryVectorStore
+from pygenai.vectorstore import InMemoryVectorStore
 
 
 def test_in_memory_vector_store_similarity_search() -> None:
