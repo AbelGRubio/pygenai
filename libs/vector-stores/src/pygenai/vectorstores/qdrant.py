@@ -17,6 +17,7 @@ from collections.abc import Sequence
 from typing import Any
 
 from pygenai.core.data import Chunk, Document, SearchHit
+
 from .base import VectorStore
 
 try:

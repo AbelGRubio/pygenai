@@ -77,7 +77,9 @@ class FAISSVectorStore(VectorStore):
         del filter_search
         query_embedding = filter_search.get("query_embedding") if filter_search else None
         if query_embedding is None:
-            msg = "FAISS similarity_search requires a query embedding vector via filter_search={'query_embedding': [...]}"
+            msg = (
+                "FAISS similarity_search requires a query embedding vector via filter_search={'query_embedding': [...]}"
+            )
             raise ValueError(msg)
 
         import numpy as np

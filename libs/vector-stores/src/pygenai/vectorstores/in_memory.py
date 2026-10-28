@@ -21,6 +21,7 @@ from langchain_core.vectorstores import InMemoryVectorStore as LangChainInMemory
 
 from pygenai.core.data import Chunk, Document, SearchHit, from_langchain_document, to_langchain_document
 from pygenai.rag.embeddings import LiteLLMEmbeddings, SimpleEmbeddings
+
 from .base import VectorStore
 
 
