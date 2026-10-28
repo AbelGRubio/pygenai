@@ -1,38 +1,33 @@
-name: Master Pipeline
+name: Master Pipeline (Proyecto Principal)
 
 on:
   push:
-    branches: [ master, develop ]
-    tags-ignore: [ 'v*' ]
+    branches: [ main, develop ]
   pull_request:
-    types: [opened, synchronize, reopened]
-    branches:
-      - master
-      - develop
-      - 'feature/*'
+    branches: [ main, develop ]
   workflow_dispatch:
 
 jobs:
   pre-commit:
     if: "!contains(github.event.head_commit.message, 'chore(release)')"
-    uses: ./.github/workflows/pre-commit.yaml
+    uses: AbelGRubio/github-actions-templates/.github/workflows/pre-commit.yml@v0.0.1
 
   test:
     needs: pre-commit
-    uses: ./.github/workflows/test.yaml
+    uses: AbelGRubio/github-actions-templates/.github/workflows/test.yml@v0.0.1
     secrets:
       PR_TOKEN_USER: ${{ secrets.PR_TOKEN }}
 
-  # sonar:
-  #   needs: test
-  #   uses: ./.github/workflows/sonarqube.yaml
-  #   secrets:
-  #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  sonar:
+    needs: test
+    uses: AbelGRubio/github-actions-templates/.github/workflows/sonar.yml@v0.0.1
+    secrets:
+      PR_TOKEN_USER: ${{ secrets.PR_TOKEN }}
 
   approve-release:
     needs: test
     if: |
-      (github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop')) ||
+      (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')) ||
       (github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     environment: release
@@ -44,67 +39,29 @@ jobs:
     permissions:
       contents: write
       packages: write
-    uses: ./.github/workflows/semantic-release.yaml
+    uses: AbelGRubio/github-actions-templates/.github/workflows/semantic-release.yml@v0.0.1
     secrets:
-      PR_TOKEN_USER: ${{ secrets.PR_TOKEN }}
+      R_TOKEN_USER: ${{ secrets.PR_TOKEN }}
 
 #  docs:
-#    needs: [test, release]
+#    needs: [ test, release ]
 #    if: |
 #      always() &&
 #      (needs.release.result == 'success') && needs.test.result == 'success' &&
 #      github.ref == 'refs/heads/main'
 #    permissions:
 #      contents: write
-#    uses: ./.github/workflows/docs.yaml
-
-#  publish:
-#    name: 🚀 Publish to PyPI
-#    needs: [ release ]
+#    uses: AbelGRubio/github-actions-templates/.github/workflows/docs.yml@v0.0.1
+#
+#
+#  docker:
+#    needs: [test, release]
 #    if: |
-#      always() &&
-#      needs.release.result == 'success' &&
-#      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
-#    runs-on: ubuntu-latest
-#    environment: publish
+#      always() && github.event_name == 'push' &&
+#      vars.ENABLE_PYPI_PUBLISH == 'true' &&
+#      (github.ref == 'refs/heads/main' || needs.release.result == 'success')
 #    permissions:
-#      id-token: write
+#      packages: write
 #      contents: read
-#    steps:
-#      - uses: actions/checkout@v6
-#        with:
-#          fetch-depth: 0
-#          token: ${{ secrets.GITHUB_TOKEN }}
-#
-#      - name: Pull latest changes (from release job)
-#        run: |
-#          git config user.name "github-actions[bot]"
-#          git config user.email "github-actions[bot]@users.noreply.github.com"
-#          git pull origin main
-#        shell: bash
-#
-#      - name: Install uv
-#        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
-#        with:
-#          enable-cache: true
-#
-#      - name: Set up Python
-#        run: uv python install 3.13
-#
-#      - name: Build package
-#        run: uv build
-#
-#      - name: Publish to PyPI
-#        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33
-
-  # 5. Docker (Solo tras un nuevo Release exitoso)
-  # docker:
-  #   needs: [test, release]
-  #   if: |
-  #     always() && github.event_name == 'push' &&
-  #     (github.ref == 'refs/heads/main' || needs.release.result == 'success')
-  #   permissions:
-  #     packages: write
-  #     contents: read
-  #   uses: ./.github/workflows/docker-publish.yaml
-  #   secrets: inherit
+#    uses: AbelGRubio/github-actions-templates/.github/workflows/docker-build-publish.yml@v0.0.1
+#    secrets: inherit
