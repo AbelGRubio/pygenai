@@ -10,8 +10,8 @@ from langgraph.graph.state import CompiledStateGraph
 from pygenai.agent.base_definition import BaseAgentDefinition
 from pygenai.agent.builder import AgentBuilder
 from pygenai.memory import BufferMemory
-from pygenai.rag import FixedSizeChunker, HybridRetriever, InMemoryVectorStore, TextLoader
-
+from pygenai.rag import FixedSizeChunker, HybridRetriever, TextLoader
+from pygenai.vectorstore import InMemoryVectorStore
 
 class CustomBuilder(AgentBuilder):
     """Custom AgentBuilder that can be extended for additional configurations."""
