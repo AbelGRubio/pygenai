@@ -18,11 +18,11 @@ jobs:
     secrets:
       PR_TOKEN_USER: ${{ secrets.PR_TOKEN }}
 
-  sonar:
-    needs: test
-    uses: AbelGRubio/github-actions-templates/.github/workflows/sonar.yml@v0.0.1
-    secrets:
-      PR_TOKEN_USER: ${{ secrets.PR_TOKEN }}
+#  sonar:
+#    needs: test
+#    uses: AbelGRubio/github-actions-templates/.github/workflows/sonarqube.yml@v0.0.1
+#    secrets:
+#      PR_TOKEN_USER: ${{ secrets.PR_TOKEN }}
 
   approve-release:
     needs: test
