@@ -180,6 +180,34 @@ section-order = [
 "tests/**" = ["S101", "D103", "D100", "D104", "SLF001", "B018"]
 
 
+# --- PYTHON-SEMANTIC-RELEASE CONFIGURATION ---
+[tool.semantic_release]
+version_variable = ["pyproject.toml:version"]
+branch = "main"
+upload_to_pypi = false
+upload_to_release = true
+build_command = "poetry build"
+
+[tool.semantic_release.branches.main]
+match = "main"
+prerelease = false
+
+[tool.semantic_release.branches.develop]
+match = "develop"
+prerelease = true
+prerelease_token = "rc"
+
+[tool.semantic_release.branches.features]
+match = "(feature|feat)/.*"
+prerelease = true
+prerelease_token = "alpha"
+
+[tool.semantic_release.branches.hotfix]
+match = "hotfix/.*"
+prerelease = true
+prerelease_token = "rc"
+
+
 
 [tool.ty.src]
 respect-ignore-files = false
