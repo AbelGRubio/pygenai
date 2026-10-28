@@ -16,7 +16,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any, Literal
 
 from pygenai.core.data import Chunk, Document, SearchHit
@@ -43,7 +43,7 @@ class MemoryRecord:
     user_id: str | None = None
     session_id: str | None = None
     tags: list[str] = field(default_factory=list)
-    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def to_document(self) -> Document:
@@ -64,7 +64,7 @@ class MemoryRecord:
         """Reconstruct a MemoryRecord from a Document object."""
         meta = dict(doc.metadata or {})
         ts_str = meta.pop("timestamp", None)
-        timestamp = datetime.fromisoformat(ts_str) if ts_str else datetime.now(timezone.utc)
+        timestamp = datetime.fromisoformat(ts_str) if ts_str else datetime.now(UTC)
 
         return cls(
             id=str(doc.id),
@@ -83,20 +83,20 @@ class VectorStore(ABC):
 
     @abstractmethod
     def add_documents(
-            self,
-            documents: Sequence[Document | Chunk],
-            *,
-            embeddings: Sequence[Sequence[float]] | None = None,
+        self,
+        documents: Sequence[Document | Chunk],
+        *,
+        embeddings: Sequence[Sequence[float]] | None = None,
     ) -> list[str]:
         """Add a collection of documents/chunks and optional precomputed embeddings."""
 
     @abstractmethod
     def similarity_search(
-            self,
-            query: str,
-            k: int = 5,
-            *,
-            filter_search: dict[str, Any] | None = None,
+        self,
+        query: str,
+        k: int = 5,
+        *,
+        filter_search: dict[str, Any] | None = None,
     ) -> list[SearchHit]:
         """Return the top-k matching documents or memories for a query."""
 
@@ -109,10 +109,10 @@ class VectorStore(ABC):
         raise NotImplementedError("Direct ID retrieval is not implemented for this store.")
 
     def add_memories(
-            self,
-            records: Sequence[MemoryRecord],
-            *,
-            embeddings: Sequence[Sequence[float]] | None = None,
+        self,
+        records: Sequence[MemoryRecord],
+        *,
+        embeddings: Sequence[Sequence[float]] | None = None,
     ) -> list[str]:
         """Convenience method to store agent memory records."""
         docs = [record.to_document() for record in records]

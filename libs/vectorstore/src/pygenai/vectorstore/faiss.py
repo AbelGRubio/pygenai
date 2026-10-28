@@ -17,6 +17,7 @@ from collections.abc import Sequence
 from typing import Any
 
 from pygenai.core.data import Chunk, Document, SearchHit
+
 from .base import VectorStore
 
 try:
@@ -45,7 +46,7 @@ class FAISSVectorStore(VectorStore):
             self._index = faiss.IndexFlatIP(dimension)
 
     def add_documents(
-            self, documents: Sequence[Document | Chunk], *, embeddings: Sequence[Sequence[float]] | None = None
+        self, documents: Sequence[Document | Chunk], *, embeddings: Sequence[Sequence[float]] | None = None
     ) -> list[str]:
         """Add documents and embeddings to the FAISS index."""
         if embeddings is None:
@@ -64,10 +65,10 @@ class FAISSVectorStore(VectorStore):
             self._documents.append(document)
             self._ids.append(str(getattr(document, "id", f"vector-{len(self._ids)}")))
 
-        return self._ids[-len(documents):]
+        return self._ids[-len(documents) :]
 
     def similarity_search(
-            self, query: str, k: int = 5, *, filter_search: dict[str, Any] | None = None
+        self, query: str, k: int = 5, *, filter_search: dict[str, Any] | None = None
     ) -> list[SearchHit]:
         """Find documents or memories by querying the FAISS index.
 
@@ -89,7 +90,7 @@ class FAISSVectorStore(VectorStore):
         distances, indices = self._index.search(q_vector, min(fetch_k, len(self._documents)))
 
         results: list[SearchHit] = []
-        for score, idx in zip(distances[0], indices[0]):
+        for score, idx in zip(distances[0], indices[0], strict=True):
             if idx < 0 or idx >= len(self._documents):
                 continue
             document = self._documents[idx]
@@ -122,9 +123,6 @@ class FAISSVectorStore(VectorStore):
         id_set = set(ids)
         new_docs: list[Document | Chunk] = []
         new_ids: list[str] = []
-
-        import numpy as np
-        kept_embeddings = []
 
         for i, doc_id in enumerate(self._ids):
             if doc_id not in id_set:

@@ -13,12 +13,13 @@ Copyright ©2026 All rights reserved.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
-from datetime import datetime, timezone
-from typing import Any, Literal
 import uuid
+from collections.abc import Sequence
+from datetime import UTC, datetime
+from typing import Any, Literal
 
 from pygenai.core.data import SearchHit
+
 from .base import MemoryRecord, VectorStore
 
 
@@ -49,7 +50,7 @@ class AgentMemoryManager:
             user_id=user_id,
             session_id=session_id,
             tags=tags or [],
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             metadata=metadata or {},
         )
         embeddings = [embedding] if embedding is not None else None

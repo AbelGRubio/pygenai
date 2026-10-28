@@ -14,7 +14,7 @@ Copyright ©2026 All rights reserved.
 from __future__ import annotations
 
 from pygenai.core.base_retriever import BaseRetriever, RetrievedDocument
-from pygenai.rag.vectorstores.base import VectorStore
+from pygenai.vectorstore.base import VectorStore
 
 
 class VectorRetriever(BaseRetriever):

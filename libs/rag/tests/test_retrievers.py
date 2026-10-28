@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pygenai.core.data import Document
 from pygenai.rag.retrievers import CrossEncoderReranker, HybridRetriever, NoOpReranker, VectorRetriever
-from pygenai.rag.vectorstores import InMemoryVectorStore
+from pygenai.vectorstore import InMemoryVectorStore
 
 
 def test_vector_retriever_returns_top_matches() -> None:

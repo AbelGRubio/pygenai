@@ -17,6 +17,7 @@ from collections.abc import Sequence
 from typing import Any
 
 from pygenai.core.data import Chunk, Document, SearchHit
+
 from .base import VectorStore
 
 try:
@@ -35,6 +36,7 @@ class ChromaVectorStore(VectorStore):
         client: Any | None = None,
         persist_directory: str | None = None,
     ) -> None:
+        """Initialize the Chroma vector store with a collection name and optional client configuration."""
         if chromadb is None and client is None:
             msg = "Chroma support requires the optional dependency 'chromadb'."
             raise ImportError(msg)
@@ -52,6 +54,7 @@ class ChromaVectorStore(VectorStore):
     def add_documents(
         self, documents: Sequence[Document | Chunk], *, embeddings: Sequence[Sequence[float]] | None = None
     ) -> list[str]:
+        """Add a collection of documents to the Chroma collection with optional precomputed embeddings."""
         ids = [str(getattr(doc, "id", f"chroma-{i}")) for i, doc in enumerate(documents)]
         texts = [doc.text for doc in documents]
         metadatas = [dict(doc.metadata) if doc.metadata else {} for doc in documents]
@@ -66,6 +69,7 @@ class ChromaVectorStore(VectorStore):
     def similarity_search(
         self, query: str, k: int = 5, *, filter_search: dict[str, Any] | None = None
     ) -> list[SearchHit]:
+        """Perform a similarity search in the Chroma collection using a query string and optional filtering."""
         kwargs: dict[str, Any] = {"query_texts": [query], "n_results": k}
         if filter_search is not None:
             kwargs["where"] = filter_search
@@ -92,6 +96,7 @@ class ChromaVectorStore(VectorStore):
         return results
 
     def delete(self, ids: Sequence[str]) -> None:
+        """Delete documents from the Chroma collection by their identifiers."""
         self._collection.delete(ids=list(ids))
 
 

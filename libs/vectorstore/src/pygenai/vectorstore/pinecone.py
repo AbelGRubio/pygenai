@@ -17,6 +17,7 @@ from collections.abc import Sequence
 from typing import Any
 
 from pygenai.core.data import Chunk, Document, SearchHit
+
 from .base import VectorStore
 
 try:
@@ -29,12 +30,12 @@ class PineconeVectorStore(VectorStore):
     """Adapter for Pinecone vector storage supporting namespaces and metadata filtering."""
 
     def __init__(
-            self,
-            index_name: str,
-            *,
-            api_key: str | None = None,
-            client: Any | None = None,
-            namespace: str = "",
+        self,
+        index_name: str,
+        *,
+        api_key: str | None = None,
+        client: Any | None = None,
+        namespace: str = "",
     ) -> None:
         """Initialize the Pinecone integration and target index connection."""
         if Pinecone is None and client is None:
@@ -51,7 +52,7 @@ class PineconeVectorStore(VectorStore):
         self._index = self._client.Index(index_name)
 
     def add_documents(
-            self, documents: Sequence[Document | Chunk], *, embeddings: Sequence[Sequence[float]] | None = None
+        self, documents: Sequence[Document | Chunk], *, embeddings: Sequence[Sequence[float]] | None = None
     ) -> list[str]:
         """Add documents with embeddings to the target Pinecone index."""
         if embeddings is None:
@@ -78,7 +79,7 @@ class PineconeVectorStore(VectorStore):
         return ids
 
     def similarity_search(
-            self, query: str, k: int = 5, *, filter_search: dict[str, Any] | None = None
+        self, query: str, k: int = 5, *, filter_search: dict[str, Any] | None = None
     ) -> list[SearchHit]:
         """Query a Pinecone index for close vectors using a query vector and metadata filters."""
         del query

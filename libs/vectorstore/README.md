@@ -90,7 +90,7 @@ CHROMA_PERSIST_DIRECTORY=./chroma_data
 Initialize a vector store and use the high-level manager to handle conversational short-term memory and persistent long-term knowledge.
 
 ```python
-from pygenai.vectorstores import InMemoryVectorStore, AgentMemoryManager
+from pygenai.vectorstore import InMemoryVectorStore, AgentMemoryManager
 
 # Initialize backend store
 store = InMemoryVectorStore()
@@ -130,7 +130,7 @@ You can also use adapters directly for document ingestion and similarity search 
 
 ```python
 from pygenai.core.data import Document
-from pygenai.vectorstores import ChromaVectorStore
+from pygenai.vectorstore import ChromaVectorStore
 
 # Initialize Chroma vector store with persistence
 vector_store = ChromaVectorStore(
