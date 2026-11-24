@@ -57,7 +57,6 @@ from typing import Any
 
 from dotenv import load_dotenv
 import streamlit as st
-import streamlit.components.v1 as components
 
 from pygenai.front.client import AskAPIError, AskClient, AskReply
 from pygenai.front.evaluator import ConversationEvaluator, ConversationEvaluationReport
@@ -211,7 +210,7 @@ def render_chat_tab(username: str, store: ChatUserStore, client: AskClient | Non
                 except (AskAPIError, RuntimeError) as exc:
                     st.error(str(exc))
 
-    components.html( # ignore[implicit-import]
+    st.iframe(
         """
         <script>
         const parentDoc = window.parent.document;
