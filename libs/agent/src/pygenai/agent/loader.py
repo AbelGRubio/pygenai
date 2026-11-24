@@ -15,7 +15,7 @@ from langgraph_api.server import app as langgraph_app
 from starlette.applications import Starlette
 from starlette.middleware.cors import CORSMiddleware
 
-from pygenai.core.cli.loader import PyGenaiLoader
+from pygenai.core.loader import PyGenaiLoader
 from pygenai.core.logger import get_logger, propague_loggers
 from pygenai.core.middlewares.auth import AuthMiddleware
 

@@ -3,7 +3,7 @@
 import typer
 
 from .launcher import run_cli
-
+from .commands.front import app as front_app
 app = typer.Typer(help="PyGenAI CLI Launcher", add_completion=True, invoke_without_command=True)
 
 
@@ -17,3 +17,4 @@ def callback_command(ctx: typer.Context) -> None:
 
 app.command()(callback_command)
 app.command("run")(run_cli)
+app.add_typer(front_app, name="front", help="Commands related to the PyGenAI front-end.")

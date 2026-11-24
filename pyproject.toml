@@ -9,7 +9,9 @@ dependencies = [
   "pygenai-llm",
   "pygenai-rag",
   "pygenai-core",
-  "pygenai-agent"
+  "pygenai-agent",
+  "pygenai-front",
+  "pygenai-cli"
 ]
 
 [project.optional-dependencies]
@@ -30,6 +32,12 @@ agent = [
 ]
 vectorstore = [
     "pygenai-vectorstore"
+]
+front = [
+    "pygenai-front"
+]
+cli = [
+    "pygenai-cli"
 ]
 
 [dependency-groups]
@@ -57,6 +65,8 @@ pygenai-memory = { workspace = true }
 pygenai-rag = { workspace = true }
 pygenai-agent = { workspace = true }
 pygenai-vectorstore = { workspace = true }
+pygenai-front = { workspace = true }
+pygenai-cli = { workspace = true }
 
 [tool.uv.workspace]
 members = [
@@ -65,7 +75,9 @@ members = [
     "libs/memory",
     "libs/rag",
     "libs/agent",
-    "libs/vectorstore"
+    "libs/vectorstore",
+    "libs/front",
+    "libs/cli"
 ]
 
 [tool.pytest.ini_options]
@@ -79,7 +91,9 @@ pythonpath = [
     "libs/llm/src",
     "libs/rag/src",
     "libs/agent/src",
-    "libs/vectorstore/src"
+    "libs/vectorstore/src",
+    "libs/front/src",
+    "libs/cli/src"
 ]
 addopts = [
     "-n",
@@ -90,6 +104,9 @@ addopts = [
     "--cov=libs/rag/src",
     "--cov=libs/core/src",
     "--cov=libs/agent/src",
+    "--cov=libs/vectorstore/src",
+    "--cov=libs/front/src",
+    "--cov=libs/cli/src",
     "--cov-report=xml",
     "--cov-report=json",
     "--cov-report=html",
