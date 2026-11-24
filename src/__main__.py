@@ -2,12 +2,12 @@
 
 import uvicorn
 
-from pygenai.agent.app import define_app
+from pygenai.agent.loader import PyGenaiAgent
 from pygenai.core.logger import get_logger, propague_loggers
 
 logger = get_logger(__name__)
 
-app = define_app()
+app = PyGenaiAgent(None).build_app()
 
 propague_loggers()
 

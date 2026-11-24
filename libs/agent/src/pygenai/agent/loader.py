@@ -8,12 +8,14 @@ Prometheus metrics instrumentation.
 import json
 import os
 from functools import lru_cache
+from typing import Any
 
 # sys.path.insert(0, os.path.abspath("src"))
 from langgraph_api.server import app as langgraph_app
 from starlette.applications import Starlette
 from starlette.middleware.cors import CORSMiddleware
 
+from pygenai.core.cli.loader import PyGenaiLoader
 from pygenai.core.logger import get_logger
 from pygenai.core.middlewares.auth import AuthMiddleware
 
@@ -43,29 +45,30 @@ def load_config() -> dict:
     return graphs
 
 
-@lru_cache(maxsize=1)
-def define_app(add_auth: bool = False) -> Starlette:
-    """Create and configure the FastAPI application instance.
+class PyGenaiAgent(PyGenaiLoader):
+    """Factory class to create and configure the PyGenAI FastAPI application."""
 
-    Args:
-        add_auth: Whether to attach the authentication middleware.
+    @lru_cache(maxsize=1)
+    def build_app(self) -> Starlette | Any | None:
+        """Build and configure the FastAPI application instance.
 
-    Returns:
-        A configured FastAPI application.
+        Returns:
+            Starlette: Configured FastAPI application.
+        """
+        load_config()
 
-    """
-    load_config()
+        if isinstance(langgraph_app, Starlette):
+            langgraph_app.add_middleware(AuthMiddleware)
 
-    if add_auth:
-        langgraph_app.add_middleware(AuthMiddleware)
+            langgraph_app.add_middleware(
+                CORSMiddleware,
+                allow_origins=["*"],
+                allow_credentials=True,
+                allow_methods=["*"],
+                allow_headers=["*"],
+            )
 
-    langgraph_app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+            logger.info("Define fastapi server.")
+            return langgraph_app
 
-    logger.info("Define fastapi server.")
-    return langgraph_app
+        return None
