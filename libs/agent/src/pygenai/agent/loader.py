@@ -16,7 +16,7 @@ from starlette.applications import Starlette
 from starlette.middleware.cors import CORSMiddleware
 
 from pygenai.core.cli.loader import PyGenaiLoader
-from pygenai.core.logger import get_logger
+from pygenai.core.logger import get_logger, propague_loggers
 from pygenai.core.middlewares.auth import AuthMiddleware
 
 logger = get_logger(__name__)
@@ -56,6 +56,7 @@ class PyGenaiAgent(PyGenaiLoader):
             Starlette: Configured FastAPI application.
         """
         load_config()
+        propague_loggers()
 
         if isinstance(langgraph_app, Starlette):
             langgraph_app.add_middleware(AuthMiddleware)

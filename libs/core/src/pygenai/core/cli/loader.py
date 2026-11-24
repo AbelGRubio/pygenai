@@ -2,7 +2,7 @@ from typing import Any
 
 
 class PyGenaiLoader:
-    def __init__(self, config):
+    def __init__(self, config: dict[str, Any] | None = None) -> None:
         self.config = config
 
     def build_app(self) -> Any:

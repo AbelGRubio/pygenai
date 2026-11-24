@@ -8,7 +8,8 @@ dependencies = [
     "litellm>=1.89.3",
     "langchain-core>=1.6.6",
     "starlette>=1.8.0",
-    "typer>=0.9.0"
+    "typer>=0.9.0",
+    "python-dotenv>=1.0"
 ]
 
 [project.scripts]

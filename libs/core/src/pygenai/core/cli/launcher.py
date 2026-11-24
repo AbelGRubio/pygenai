@@ -14,6 +14,7 @@ from typing import Any
 
 import typer
 import uvicorn
+from dotenv import load_dotenv
 
 from pygenai.core.cli.loader import PyGenaiLoader
 
@@ -70,6 +71,8 @@ def load_agent() -> type[PyGenaiLoader] | None:
         Loader instance for the configured agent module.
     """
     project_root = os.getcwd()
+    load_dotenv(dotenv_path=os.path.join(project_root, ".env"), override=False)
+
     if project_root not in sys.path:
         sys.path.insert(0, project_root)
 
