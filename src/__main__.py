@@ -1,6 +1,6 @@
 """Entry point."""
 
-from pygenai.core.cli.cli import app
+from pygenai.cli.cli import app
 
 
 if __name__ == "__main__":
