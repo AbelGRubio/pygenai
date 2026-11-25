@@ -17,7 +17,7 @@ from unittest.mock import Mock, patch
 from typer.testing import CliRunner
 
 from pygenai.cli.cli import app
-from pygenai.cli.launcher import PyGenaiLauncher, load_agent, run_cli
+from pygenai.cli.commands.launcher import PyGenaiLauncher, load_agent, run_cli
 
 
 runner = CliRunner()
@@ -41,7 +41,7 @@ def test_launcher_run_passes_options_to_uvicorn() -> None:
     loader = Mock()
     loader.build_app.return_value = built_app
 
-    with patch("pygenai.cli.launcher.uvicorn.run") as uvicorn_run:
+    with patch("pygenai.cli.commands.launcher.uvicorn.run") as uvicorn_run:
         PyGenaiLauncher(loader).run(host="0.0.0.0", port=9000, log_level="debug", reload=True)
 
     uvicorn_run.assert_called_once_with(
@@ -62,7 +62,7 @@ def test_load_agent_uses_environment_module_and_class() -> None:
 
     with (
         patch.dict("os.environ", {"AGENT_MODULE": "custom_agent"}),
-        patch("pygenai.cli.launcher.importlib.import_module", return_value=module),
+        patch("pygenai.cli.commands.launcher.importlib.import_module", return_value=module),
     ):
         result = load_agent()
 
@@ -75,7 +75,7 @@ def test_load_agent_defaults_to_missing_project_loader() -> None:
 
     with (
         patch.dict("os.environ", {}, clear=True),
-        patch("pygenai.cli.launcher.importlib.import_module", return_value=module),
+        patch("pygenai.cli.commands.launcher.importlib.import_module", return_value=module),
     ):
         assert load_agent() is None
 
@@ -86,8 +86,8 @@ def test_run_cli_starts_launcher_with_options() -> None:
     launcher_instance = Mock()
 
     with (
-        patch("pygenai.cli.launcher.load_agent", return_value=loader_class),
-        patch("pygenai.cli.launcher.PyGenaiLauncher", return_value=launcher_instance),
+        patch("pygenai.cli.commands.launcher.load_agent", return_value=loader_class),
+        patch("pygenai.cli.commands.launcher.PyGenaiLauncher", return_value=launcher_instance),
     ):
         run_cli(host="127.0.0.1", port=8124, log_level="warning", reload=True)
 
@@ -102,7 +102,7 @@ def test_run_cli_starts_launcher_with_options() -> None:
 
 def test_run_cli_fails_when_loader_cannot_be_loaded() -> None:
     """Verify the CLI exits cleanly when no loader class is available."""
-    with patch("pygenai.cli.launcher.load_agent", return_value=None):
+    with patch("pygenai.cli.commands.launcher.load_agent", return_value=None):
         result = runner.invoke(app, ["run"])
 
     assert result.exit_code == 1
@@ -115,8 +115,8 @@ def test_cli_run_forwards_command_options() -> None:
     launcher_instance = Mock()
 
     with (
-        patch("pygenai.cli.launcher.load_agent", return_value=loader_class),
-        patch("pygenai.cli.launcher.PyGenaiLauncher", return_value=launcher_instance),
+        patch("pygenai.cli.commands.launcher.load_agent", return_value=loader_class),
+        patch("pygenai.cli.commands.launcher.PyGenaiLauncher", return_value=launcher_instance),
     ):
         result = runner.invoke(
             app,
