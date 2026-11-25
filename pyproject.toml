@@ -195,6 +195,7 @@ section-order = [
 "**.ipynb" = ["E501", "D100", "D103", "D101", "E402", "I002", "T201"]
 "**/__init__.py" = ["D104", "F401"]
 "tests/**" = ["S101", "D103", "D100", "D104", "SLF001", "B018"]
+"libs/*/*/tests/**" = ["S101", "D103", "D100", "D104", "SLF001", "B018"]
 
 
 # --- PYTHON-SEMANTIC-RELEASE CONFIGURATION ---

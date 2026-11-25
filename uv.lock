@@ -2656,12 +2656,14 @@ version = "0.1.0"
 source = { editable = "libs/cli" }
 dependencies = [
     { name = "pydantic-settings" },
+    { name = "pygenai-core" },
     { name = "typer" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "pydantic-settings", specifier = ">=2.16.3" },
+    { name = "pygenai-core", editable = "libs/core" },
     { name = "typer", specifier = ">=0.9.0" },
 ]
 

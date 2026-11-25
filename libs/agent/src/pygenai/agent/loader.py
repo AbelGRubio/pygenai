@@ -45,10 +45,10 @@ def load_config() -> dict:
     return graphs
 
 
+@lru_cache(maxsize=1)
 class PyGenaiAgent(PyGenaiLoader):
     """Factory class to create and configure the PyGenAI FastAPI application."""
 
-    @lru_cache(maxsize=1)
     def build_app(self) -> Starlette | Any | None:
         """Build and configure the FastAPI application instance.
 

@@ -3,7 +3,6 @@
 ====================================================================================================
 Name:         tests/front/test_client.py
 Description:  Cover response parsing, HTTP calls, and API errors
-Project:      agile-monkeys
 Date:         2026-11-19
 Status:       Development
 
@@ -16,10 +15,15 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from agile_monkeys.front.client import AskAPIError, AskClient, parse_dict_string
+from pygenai.front.client import AskAPIError, AskClient, parse_dict_string
 
 
 def test_parse_dict_string_accepts_supported_formats() -> None:
+    """Verify that supported dictionary representations are parsed correctly.
+
+    The test covers an existing dictionary, JSON and Python-style strings,
+    unsupported sequences, invalid text, non-string values, and whitespace.
+    """
     value = {"text_response": "already parsed"}
 
     assert parse_dict_string(value) is value
@@ -32,14 +36,19 @@ def test_parse_dict_string_accepts_supported_formats() -> None:
 
 
 def test_init_requires_configured_base_url_and_project_key() -> None:
-    with patch("agile_monkeys.front.client.get_settings", return_value=SimpleNamespace(
-        hiring_lab_base_url="", hiring_lab_project_key="key"
-    )):
-        with pytest.raises(ValueError, match="Missing HIRING_LAB_BASE_URL"):
-            AskClient()
+    """Verify that client initialization fails when the base URL is missing."""
+    with (
+        patch(
+            "agile_monkeys.front.client.get_settings",
+            return_value=SimpleNamespace(hiring_lab_base_url="", hiring_lab_project_key="key"),
+        ),
+        pytest.raises(ValueError, match="Missing HIRING_LAB_BASE_URL"),
+    ):
+        AskClient()
 
 
 def test_init_uses_application_settings() -> None:
+    """Verify that client configuration is loaded from application settings."""
     settings = SimpleNamespace(
         hiring_lab_base_url="https://api.example.test",
         hiring_lab_project_key="secret",
@@ -54,6 +63,7 @@ def test_init_uses_application_settings() -> None:
 
 
 def test_send_message_posts_payload_and_parses_reply() -> None:
+    """Verify the HTTP request payload, headers, timeout, and parsed response."""
     settings = SimpleNamespace(
         hiring_lab_base_url="https://api.example.test",
         hiring_lab_project_key="secret",
@@ -89,6 +99,7 @@ def test_send_message_posts_payload_and_parses_reply() -> None:
 
 
 def test_send_message_handles_defaults_and_invalid_optional_fields() -> None:
+    """Verify safe defaults for missing or invalid optional response fields."""
     settings = SimpleNamespace(
         hiring_lab_base_url="https://api.example.test",
         hiring_lab_project_key="secret",
@@ -115,6 +126,7 @@ def test_send_message_handles_defaults_and_invalid_optional_fields() -> None:
 
 
 def test_send_message_raises_api_error() -> None:
+    """Verify that unsuccessful HTTP responses raise an API error with status and detail."""
     settings = SimpleNamespace(
         hiring_lab_base_url="https://api.example.test",
         hiring_lab_project_key="secret",
