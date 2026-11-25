@@ -162,7 +162,7 @@ async def test_reasoning_node_calls_react_agent(monkeypatch) -> None:
     class FakeReactAgent:
         async def ainvoke(self, payload: dict[str, object]) -> dict[str, list[object]]:
             assert payload["messages"]
-            return {"messages": [HumanMessage(content="answer")]} 
+            return {"messages": [HumanMessage(content="answer")]}
 
     monkeypatch.setattr(
         "pygenai.agent.node_executor.create_agent",

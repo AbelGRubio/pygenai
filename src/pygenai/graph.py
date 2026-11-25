@@ -7,7 +7,7 @@ from langchain_mcp_adapters.sessions import StreamableHttpConnection
 
 from pygenai.agent import BaseAgentDefinition
 from pygenai.memory import BufferMemory
-from pygenai.rag import FixedSizeChunker, TextLoader, HybridRetriever
+from pygenai.rag import FixedSizeChunker, HybridRetriever, TextLoader
 from pygenai.vectorstore import InMemoryVectorStore
 
 
