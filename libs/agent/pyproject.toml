@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/pygenai/agent"]
+packages = ["src/pygenai"]
 
 [build-system]
 requires = ["hatchling"]

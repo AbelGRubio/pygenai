@@ -10,7 +10,7 @@ from pygenai.memory.buffer_memory import BufferMemory
 from pygenai.rag.chunking import FixedSizeChunker
 from pygenai.rag.loaders import TextLoader
 from pygenai.rag.retrievers import HybridRetriever
-from pygenai.rag.vectorstores import InMemoryVectorStore
+from pygenai.vectorstore import InMemoryVectorStore
 
 
 class DemoCopilotAgent(BaseAgentDefinition):

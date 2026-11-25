@@ -11,7 +11,7 @@ dependencies = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/pygenai/vectorstore"]
+packages = ["src/pygenai"]
 
 [build-system]
 requires = ["hatchling"]
