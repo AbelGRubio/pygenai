@@ -120,7 +120,6 @@ python_functions = "test_* it_* should_* scenario_*"
 [tool.coverage.run]
 omit = [
     "src/__main__.py",
-    "src/__streamlit__.py",
 ]
 
 [tool.coverage.report]
@@ -140,7 +139,6 @@ extend-exclude = [
     "notebooks_extra",
     "tests",
     "src/__main__.py",
-    "src/__streamlit__.py",
     "**/examples/**",
     "examples"
 ]

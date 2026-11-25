@@ -75,7 +75,11 @@ class TestInMemoryAdapter:
 
         monkeypatch.setattr(in_memory, "LangChainInMemoryVectorStore", lambda embedding: FakeStore())
         monkeypatch.setattr(in_memory, "to_langchain_document", lambda document: lc_document)
-        monkeypatch.setattr(in_memory, "from_langchain_document", lambda document: Document(id="doc-1", text="A", metadata=document.metadata))
+        monkeypatch.setattr(
+            in_memory,
+            "from_langchain_document",
+            lambda document: Document(id="doc-1", text="A", metadata=document.metadata),
+        )
 
         store = in_memory.InMemoryVectorStore(embeddings=SimpleEmbeddings())
         ids = store.add_documents([Document(id="doc-1", text="A")])
