@@ -51,15 +51,14 @@ Use `--host`, `--port`, and `--no-browser` when a custom server address or
 headless startup is required.
 """
 
-
 from types import SimpleNamespace
 from typing import Any
 
-from dotenv import load_dotenv
 import streamlit as st
+from dotenv import load_dotenv
 
 from pygenai.front.client import AskAPIError, AskClient, AskReply
-from pygenai.front.evaluator import ConversationEvaluator, ConversationEvaluationReport
+from pygenai.front.evaluator import ConversationEvaluationReport, ConversationEvaluator
 from pygenai.front.storage import ChatUserStore
 
 load_dotenv()
@@ -158,9 +157,7 @@ def render_chat_tab(username: str, store: ChatUserStore, client: AskClient | Non
     messages: list[dict[str, Any]] = list(chat_data.get("messages", []))
 
     top_left, top_right = st.columns([3, 1])
-    top_left.caption(
-        f"User: `{username}` | Conversation ID: `{conversation_id or 'New on first message'}`"
-    )
+    top_left.caption(f"User: `{username}` | Conversation ID: `{conversation_id or 'New on first message'}`")
     if top_right.button("New chat"):
         store.save_chat(username, conversation_id=None, messages=[])
         st.rerun()
@@ -185,22 +182,18 @@ def render_chat_tab(username: str, store: ChatUserStore, client: AskClient | Non
 
             with st.chat_message("assistant"), st.spinner("Thinking..."):
                 try:
-                    reply: AskReply = client.send_message(
-                        question=prompt, conversation_id=conversation_id
-                    )
+                    reply: AskReply = client.send_message(question=prompt, conversation_id=conversation_id)
                     st.markdown(reply.response)
-                    messages.append(
-                        {
-                            "role": "assistant",
-                            "content": reply.response,
-                            "meta": {
-                                "conversation_id": reply.conversation_id,
-                                "duration_ms": reply.duration_ms,
-                                "snapshot": reply.snapshot,
-                                "data": reply.data,
-                            },
-                        }
-                    )
+                    messages.append({
+                        "role": "assistant",
+                        "content": reply.response,
+                        "meta": {
+                            "conversation_id": reply.conversation_id,
+                            "duration_ms": reply.duration_ms,
+                            "snapshot": reply.snapshot,
+                            "data": reply.data,
+                        },
+                    })
                     store.save_chat(
                         username=username,
                         conversation_id=reply.conversation_id,
@@ -255,13 +248,11 @@ def render_evaluation_tab(username: str, store: ChatUserStore) -> None:
 
     if report.snapshot_summary:
         with st.expander("Snapshot & Project Evidence"):
-            st.json(
-                {
-                    "conversation_id": report.conversation_id,
-                    "snapshot_summary": report.snapshot_summary,
-                    "tools_invoked": report.tools_invoked,
-                }
-            )
+            st.json({
+                "conversation_id": report.conversation_id,
+                "snapshot_summary": report.snapshot_summary,
+                "tools_invoked": report.tools_invoked,
+            })
 
     st.markdown("### Full Transcript & Turn Evidence")
     for turn_eval in report.turn_evaluations:

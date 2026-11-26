@@ -5,11 +5,9 @@ from typing import Any
 
 from langchain_mcp_adapters.sessions import StreamableHttpConnection
 
-from pygenai.agent.base_definition import BaseAgentDefinition
-from pygenai.memory.buffer_memory import BufferMemory
-from pygenai.rag.chunking import FixedSizeChunker
-from pygenai.rag.loaders import TextLoader
-from pygenai.rag.retrievers import HybridRetriever
+from pygenai.agent import BaseAgentDefinition
+from pygenai.memory import BufferMemory
+from pygenai.rag import FixedSizeChunker, HybridRetriever, TextLoader
 from pygenai.vectorstore import InMemoryVectorStore
 
 

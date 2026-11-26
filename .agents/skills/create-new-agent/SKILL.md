@@ -83,7 +83,7 @@ class DemoCopilotAgent(BaseAgentDefinition):
         """Configure Model Context Protocol (MCP) server endpoints."""
         return {
             "demo_mcp": StreamableHttpConnection(
-                url="http://localhost:8000/mcp", 
+                url="http://localhost:8000/mcp",
                 transport="streamable_http"
             )
         }

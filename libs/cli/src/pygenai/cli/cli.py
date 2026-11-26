@@ -2,8 +2,9 @@
 
 import typer
 
-from .launcher import run_cli
 from .commands.front import app as front_app
+from .commands.launcher import run_cli
+
 app = typer.Typer(help="PyGenAI CLI Launcher", add_completion=True, invoke_without_command=True)
 
 
