@@ -38,7 +38,6 @@ def load_config() -> dict:
 
         graphs = config_data.get("graphs", {})
         os.environ[LANGSERVE_GRAPHS] = json.dumps(graphs)
-        os.environ["REDIS_URI"] = "localhost:6379"
 
         logger.info(f"Graph file loaded: {graphs}")
     except FileNotFoundError as e:
