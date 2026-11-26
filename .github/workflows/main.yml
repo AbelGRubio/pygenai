@@ -1,4 +1,4 @@
-name: Master Pipeline (Proyecto Principal)
+name: Master Pipeline
 
 on:
   push:

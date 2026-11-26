@@ -9,7 +9,9 @@ dependencies = [
   "pygenai-llm",
   "pygenai-rag",
   "pygenai-core",
-  "pygenai-agent"
+  "pygenai-agent",
+  "pygenai-front",
+  "pygenai-cli"
 ]
 
 [project.optional-dependencies]
@@ -30,6 +32,12 @@ agent = [
 ]
 vectorstore = [
     "pygenai-vectorstore"
+]
+front = [
+    "pygenai-front"
+]
+cli = [
+    "pygenai-cli"
 ]
 
 [dependency-groups]
@@ -57,6 +65,8 @@ pygenai-memory = { workspace = true }
 pygenai-rag = { workspace = true }
 pygenai-agent = { workspace = true }
 pygenai-vectorstore = { workspace = true }
+pygenai-front = { workspace = true }
+pygenai-cli = { workspace = true }
 
 [tool.uv.workspace]
 members = [
@@ -65,7 +75,9 @@ members = [
     "libs/memory",
     "libs/rag",
     "libs/agent",
-    "libs/vectorstore"
+    "libs/vectorstore",
+    "libs/front",
+    "libs/cli"
 ]
 
 [tool.pytest.ini_options]
@@ -79,7 +91,9 @@ pythonpath = [
     "libs/llm/src",
     "libs/rag/src",
     "libs/agent/src",
-    "libs/vectorstore/src"
+    "libs/vectorstore/src",
+    "libs/front/src",
+    "libs/cli/src"
 ]
 addopts = [
     "-n",
@@ -90,6 +104,9 @@ addopts = [
     "--cov=libs/rag/src",
     "--cov=libs/core/src",
     "--cov=libs/agent/src",
+    "--cov=libs/vectorstore/src",
+    "--cov=libs/front/src",
+    "--cov=libs/cli/src",
     "--cov-report=xml",
     "--cov-report=json",
     "--cov-report=html",
@@ -103,7 +120,6 @@ python_functions = "test_* it_* should_* scenario_*"
 [tool.coverage.run]
 omit = [
     "src/__main__.py",
-    "src/__streamlit__.py",
 ]
 
 [tool.coverage.report]
@@ -123,7 +139,6 @@ extend-exclude = [
     "notebooks_extra",
     "tests",
     "src/__main__.py",
-    "src/__streamlit__.py",
     "**/examples/**",
     "examples"
 ]
@@ -178,6 +193,7 @@ section-order = [
 "**.ipynb" = ["E501", "D100", "D103", "D101", "E402", "I002", "T201"]
 "**/__init__.py" = ["D104", "F401"]
 "tests/**" = ["S101", "D103", "D100", "D104", "SLF001", "B018"]
+"libs/*/*/tests/**" = ["S101", "D103", "D100", "D104", "SLF001", "B018"]
 
 
 # --- PYTHON-SEMANTIC-RELEASE CONFIGURATION ---
@@ -186,7 +202,7 @@ version_variable = ["pyproject.toml:version"]
 branch = "main"
 upload_to_pypi = false
 upload_to_release = true
-build_command = "poetry build"
+build_command = "uv build"
 
 [tool.semantic_release.branches.main]
 match = "main"
@@ -229,4 +245,12 @@ search-path = [
     "src",
     # ".venv/lib/python3.13/site-packages",
     ".venv/Lib/site-packages",
+]
+
+[tool.setuptools.packages.find]
+where = ["src", "libs"]
+
+[tool.hatch.build.targets.wheel]
+packages = [
+    "src/pygenai",
 ]

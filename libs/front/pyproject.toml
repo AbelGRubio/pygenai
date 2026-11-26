@@ -1,0 +1,18 @@
+[project]
+name = "pygenai-front"
+version = "0.1.0"
+description = "Frontend library for pygenai, providing a Streamlit-based interface."
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "pydantic-settings>=2.16.3",
+    "requests>=2.34.2",
+    "streamlit>=1.65.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pygenai"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
