@@ -1,6 +1,10 @@
 """Tests for agent builder and declarative base definition."""
 
+import os
 from types import SimpleNamespace
+
+os.environ.setdefault("REDIS_URI", "redis://localhost:6379")
+os.environ.setdefault("LANGGRAPH_RUNTIME_EDITION", "inmem")
 
 from pygenai.agent.base_definition import BaseAgentDefinition
 from pygenai.agent.builder import AgentBuilder
