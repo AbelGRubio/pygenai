@@ -78,4 +78,5 @@ COPY --chown=bedrock_agentcore:bedrock_agentcore src/ src/
 # ──────────────────────────────────────────────
 # Entrypoint / CMD
 # ──────────────────────────────────────────────
-CMD ["opentelemetry-instrument", "uvicorn", "src.__main__:app"]
+ENTRYPOINT ["opentelemetry-instrument", "pygenai"]
+CMD ["RUN", "--PORT", "8000"]
